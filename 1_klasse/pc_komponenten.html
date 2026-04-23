@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,7 +10,7 @@
             --primary: #00e5ff;
             --sidebar-bg: rgba(15, 10, 25, 0.85);
             --text-main: #e0e6ed;
-            --sidebar-width: 400px;
+            --sidebar-width: 40%;
         }
 
         body {
@@ -32,7 +33,10 @@
             cursor: grab;
             background: linear-gradient(to top left, #2a0845, #ffb347);
         }
-        #canvas-container:active { cursor: grabbing; }
+
+        #canvas-container:active {
+            cursor: grabbing;
+        }
 
         /* Fixe Sidebar Rechts */
         #sidebar {
@@ -42,12 +46,12 @@
             width: var(--sidebar-width);
             height: 100vh;
             background: var(--sidebar-bg);
-            border-left: 1px solid rgba(255,255,255,0.1);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
             z-index: 10;
             display: flex;
             flex-direction: column;
-            box-shadow: -10px 0 40px rgba(0,0,0,0.3);
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.3);
         }
 
         #start-screen {
@@ -89,11 +93,11 @@
 
         .tour-header {
             padding: 15px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
             flex-shrink: 0;
         }
-        
+
         .tour-header h2 {
             margin: 0;
             color: var(--primary);
@@ -107,11 +111,22 @@
             overflow-y: auto;
         }
 
-        #accordion-container::-webkit-scrollbar { width: 6px; }
-        #accordion-container::-webkit-scrollbar-track { background: transparent; }
-        #accordion-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+        #accordion-container::-webkit-scrollbar {
+            width: 6px;
+        }
 
-        .acc-item { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        #accordion-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #accordion-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .acc-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
 
         .acc-header {
             padding: 12px 20px;
@@ -124,19 +139,34 @@
             align-items: center;
         }
 
-        .acc-header:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .acc-header:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
 
         .acc-body {
             max-height: 0;
             overflow-y: auto;
             transition: max-height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.3);
         }
 
-        .acc-body::-webkit-scrollbar { width: 4px; }
-        .acc-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
+        .acc-body::-webkit-scrollbar {
+            width: 4px;
+        }
 
-        .acc-content { padding: 0 20px 15px 20px; }
+        .acc-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .acc-content {
+            padding: 0 20px 15px 20px;
+        }
+
+        .acc-body strong {
+            font-size: 16px;
+        }
 
         .info-img {
             width: 100%;
@@ -151,12 +181,20 @@
             color: #888;
             font-style: italic;
             font-size: 12px;
-            border: 1px dashed rgba(255,255,255,0.2);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
             object-fit: cover;
         }
 
+        .fig-cap{
+            font-size: 10px;
+        }
+
+        .fig-cap a{
+            color: #00e5ff;
+        }
+
         .acc-content p {
-            margin: 0;
+            margin: 0 5;
             line-height: 1.5;
             color: #ddd;
             font-size: 13px;
@@ -169,7 +207,9 @@
             padding-left: 16px;
         }
 
-        .acc-item.active .acc-body { max-height: 45vh; } 
+        .acc-item.active .acc-body {
+            max-height: 45vh;
+        }
 
         #tooltip {
             position: absolute;
@@ -188,45 +228,160 @@
             transform: translate(15px, 15px);
         }
 
+        /* --- LIGHTBOX --- */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            align-items: center;
+            justify-content: center;
+        }
+        #lightbox.open { display: flex; }
+
+        #lightbox-inner {
+            position: relative;
+            max-width: min(90vw, 900px);
+            max-height: 90vh;
+            background: rgba(15, 10, 25, 0.95);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 0 60px rgba(0, 229, 255, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+        }
+
+        #lightbox-img {
+            width: 100%;
+            height: auto;
+            max-height: 65vh;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        #lightbox-caption {
+            font-size: 11px;
+            color: #888;
+        }
+        #lightbox-caption a { color: var(--primary); }
+
+        #lightbox-title {
+            color: var(--primary);
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        #lightbox-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 22px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+        }
+        #lightbox-close:hover { color: #fff; }
+
+        .info-img { cursor: zoom-in; }
+
         /* --- MOBILE LAYOUT (< 768px) --- */
         @media (max-width: 768px) {
-            body { flex-direction: column; }
+            body {
+                flex-direction: column;
+            }
 
             #canvas-container {
                 width: 100vw;
                 height: 50vh;
                 transition: height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
             }
+
             #sidebar {
                 width: 100vw;
                 height: 50vh;
                 top: 50vh;
                 right: 0;
                 border-left: none;
-                border-top: 1px solid rgba(255,255,255,0.2);
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
                 transition: height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
             }
 
-            body.mobile-3d-active #canvas-container { height: 75vh; }
-            body.mobile-3d-active #sidebar { height: 25vh; top: 75vh; }
+            body.mobile-3d-active #canvas-container {
+                height: 75vh;
+            }
 
-            body.mobile-panel-active #canvas-container { height: 25vh; }
-            body.mobile-panel-active #sidebar { height: 75vh; top: 25vh; }
+            body.mobile-3d-active #sidebar {
+                height: 25vh;
+                top: 75vh;
+            }
 
-            .tour-header { padding: 10px 15px; }
-            .tour-header h2 { font-size: 16px; }
-            .acc-header { padding: 10px 15px; font-size: 13px; }
-            .acc-content { padding: 0 15px 10px 15px; }
-            .info-img { min-height: 80px; margin: 5px 0 10px 0; }
-            .acc-content p { font-size: 12px; }
+            body.mobile-panel-active #canvas-container {
+                height: 25vh;
+            }
 
-            .acc-item.active .acc-body { max-height: 40vh; } 
+            body.mobile-panel-active #sidebar {
+                height: 75vh;
+                top: 25vh;
+            }
+
+            .tour-header {
+                padding: 10px 15px;
+            }
+
+            .tour-header h2 {
+                font-size: 16px;
+            }
+
+            .acc-header {
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+
+            .acc-content {
+                padding: 0 15px 10px 15px;
+            }
+
+            .info-img {
+                min-height: 80px;
+                margin: 5px 0 10px 0;
+            }
+
+            .acc-content p {
+                font-size: 12px;
+                margin-bottom: 5px;
+            }
+
+            .acc-item.active .acc-body {
+                max-height: 40vh;
+            }
         }
     </style>
 </head>
+
 <body class="mobile-3d-active">
 
     <div id="tooltip">Komponente</div>
+
+    <div id="lightbox">
+        <div id="lightbox-inner">
+            <button id="lightbox-close">✕</button>
+            <p id="lightbox-title"></p>
+            <img id="lightbox-img" src="" alt="">
+            <div id="lightbox-caption"></div>
+            <div id="lightbox-desc"></div>
+        </div>
+    </div>
 
     <div id="canvas-container"></div>
 
@@ -260,48 +415,85 @@
 
         // --- DATENSTRUKTUR ---
         const colors = {
-            case: 0x454b54,    
-            mb: 0x1B5E20,      
-            cpu: 0xCFD8DC,     
-            ram: 0x00E5FF,     
-            gpu: 0xD50000,     
-            psu: 0xFF6D00,     
-            ssd: 0x2962FF,     
-            frontio: 0x90A4AE, 
-            c_mb: 0xffffff,    
-            c_cpu: 0x78909C,   
-            c_ext: 0x111111,   
-            c_gpu: 0xFFD600,   
-            c_ssd: 0xD50000    
+            case: 0x454b54,
+            mb: 0x1B5E20,
+            cpu: 0xCFD8DC,
+            ram: 0x00E5FF,
+            gpu: 0xD50000,
+            psu: 0xFF6D00,
+            ssd: 0x2962FF,
+            frontio: 0x90A4AE,
+            c_mb: 0xffffff,
+            c_cpu: 0x78909C,
+            c_ext: 0x111111,
+            c_gpu: 0xFFD600,
+            c_ssd: 0xD50000
         };
 
         // Reduzierte Liste (Kabel sind jetzt Teil der Hauptkomponente)
         const compData = {
-            'case': { title: '1. PC-Gehäuse', desc: 'Das Gehäuse schützt alle Bauteile. Hinten siehst du Anschlüsse für Strom und Peripheriegeräte. Vorne befindet sich das Front-Panel mit dem Power-Button.' },
-            'mb': { title: '2. Motherboard', desc: 'Die Hauptplatine. Sie verbindet alle Bauteile elektronisch. Das hintere Anschlusspanel ragt direkt aus dem Gehäuse heraus.' },
-            'cpu': { title: '3. Prozessor (CPU)', desc: 'Das Gehirn des Computers. Sitzt auf dem Sockel des Motherboards und berechnet alle logischen Aufgaben.' },
-            'ram': { title: '4. Arbeitsspeicher (RAM)', desc: 'Zwei Module neben der CPU. Der extrem schnelle Kurzzeitspeicher für Daten, die jetzt gerade verarbeitet werden.' },
-            'gpu': { title: '5. Grafikkarte (GPU)', desc: 'Übernimmt alle komplexen 3D-Berechnungen für Spiele. Ihre Monitor-Anschlüsse ragen hinten aus dem PC heraus.' },
-            'psu': { title: '6. Netzteil (PSU) & Stromkabel', desc: 'Wandelt Strom aus der Steckdose um. Die sichtbaren Kabel versorgen Motherboard (weiß), CPU (grau) und GPU (gelb) sicher mit Energie.' },
-            'ssd': { title: '7. SSD & Datenkabel', desc: 'Der Langzeitspeicher für Windows und Bilder. Sie sitzt im Laufwerksschacht und sendet Daten über das rote SATA-Kabel ans Motherboard.' },
-            'frontio': { title: '8. Front-Panel', desc: 'Die Front-Anschlüsse (USB, Audio) und der Startknopf. Ein internes Kabel leitet die Signale direkt ans Motherboard.' }
+            'case': { 
+                title: '1. PC-Gehäuse', 
+                desc: '<p><strong>Weitere Bezeichnungen</strong><br> <em>Case</em>, <em>Chassis</em>, Computergehäuse.</p><p><strong>Aufgabe</strong><br> Schützt die eingebauten Bauteile vor Staub, Berührung und Beschädigung. Gibt dem Computer Stabilität und sorgt mit Lüftern, Öffnungen und Luftstrom für Kühlung.</p><p><strong>Verbindung</strong><br> Enthält Befestigungen für Motherboard, Netzteil und Laufwerke. Vorne sitzen oft Power-Knopf und eine Öffnung für das Front-Panel. Hinten befinden sich Öffnungen für Anschlüsse und Erweiterungskarten.</p><p><strong>Wissenswertes</strong><br> Es gibt verschiednigste Gehäuse, von kompakten Mini-PCs bis zu grossen Gaming-Towern.</p>', 
+                source: '<a href="https://commons.wikimedia.org/wiki/File:NZXT_ATX_Case_6_2019-03-21.jpg" target="_blank"> FASTILY, <em>NZXT ATX Case</em></a> - <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a>', 
+                img: './images/pc_cases.jpg' 
+                },
+            'mb': { title: '2. Motherboard', 
+                    desc: '<p><strong>Weitere Bezeichnungen</strong><br> <em>Mainboard</em>, Hauptplatine.</p><p><strong>Aufgabe</strong><br> Zentrale Leiterplatte des Computers. Verbindet alle Komponenten elektrisch, verteilt Strom und ermöglicht Datenaustausch zwischen Prozessor, Speicher und weiteren Geräten.</p><p><strong>Verbindung</strong><br> CPU sitzt im Sockel, RAM in Steckplätzen, Grafikkarte meist im PCIe-Slot. Laufwerke, Lüfter, Front-Panel und Netzteil werden per Kabel angeschlossen.</p><p><strong>Wissenswertes</strong><br> Ursprünglich gab es zusätzliche Karten z.B. für Netzwerk oder Sound. Heute sind diese Funktionalitäten meist schon integriert.</p>', 
+                    source: '<a href="https://pixabay.com/photos/motherboard-computer-plate-3406930/" target="_blank">kameng, <em>Motherboard</em></a> - <a href="https://pixabay.com/service/license-summary/" target="_blank">Pixabay Content License</a>'  , 
+                    img: './images/motherboard.jpg'
+                },
+            'cpu': { title: '3. Prozessor (CPU)', 
+                    desc: '<p><strong>Weitere Bezeichnungen</strong><br> CPU (<em>Central Processing Unit</em>), Prozessor.</p><p><strong>Aufgabe</strong><br> Führt Befehle von Programmen aus, verarbeitet Daten und steuert zentrale Abläufe des Systems. Sie gilt als „Gehirn“ des Computers.</p><p><strong>Verbindung</strong><br> Sitzt im CPU-Sockel des Motherboards. Tauscht Daten mit RAM aus und wird direkt vom Netzteil mit Strom versorgt. Benötigt meist einen Kühler.</p><p><strong>Wissenswertes</strong><br> Alte Prozessoren bestanden aus einem Kern (eine einzelne Recheneinheit). Moderne CPUs besitzen mehrere Rechenkerne für paralleles Arbeiten. Diese arbeiten mit einem Takt von ca. 2.5-4.5 GHz - das sind 2.5-4.5 Taktzyklen pro Sekunde. In jedem Takt kann die CPU je nach Aufgabe unterschiedlich viel Arbeit erledigen.</p>', 
+                    source: '<a href="https://commons.wikimedia.org/wiki/File:Athlon_64_X2_E6_3800.jpg" target="_blank">Echoray, <em>Athlon 64 X2 3800+</em></a> - <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">CC BY-SA 3.0</a>', 
+                    img: './images/cpu.jpg'  
+                },
+            'ram': { title: '4. Arbeitsspeicher (RAM)', 
+                    desc: '<p><strong>Weitere Bezeichnungen</strong><br> RAM (<em>Random Access Memory</em>), Arbeitsspeicher.</p><p><strong>Aufgabe</strong><br> Sehr schneller Kurzzeitspeicher für Daten und Programme, die gerade aktiv gebraucht werden. Inhalt geht beim Ausschalten verloren.</p><p><strong>Verbindung</strong><br> Steckmodule sitzen in RAM-Slots auf dem Motherboard und kommunizieren direkt mit der CPU.</p><p><strong>Wissenswertes</strong><br> Die Grösse stieg von wenigen Megabyte auf heute oft 16 bis 64 Gigabyte in Privat-PCs.</p>', 
+                    source: '<a href="https://commons.wikimedia.org/wiki/File:RamTypes.JPG" target="_blank">Steve Jurvetson, <em>RAM Types</em></a> - <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC BY-SA 2.0</a>', 
+                    img: './images/ram.jpg'  
+                },
+            'gpu': { title: '5. Grafikkarte (GPU)', 
+                    desc: '<p><strong>Weitere Bezeichnungen</strong><br> GPU (<em>Graphics Processing Unit</em>), Grafikkarte.</p><p><strong>Aufgabe</strong><br> Berechnet Bilder, 3D-Grafik, Videos und viele parallele Rechenaufgaben. Entlastet dadurch die CPU.</p><p><strong>Verbindung</strong><br> Steckt meist im PCIe-Slot des Motherboards. Leistungsstarke Modelle erhalten zusätzlichen Strom direkt vom Netzteil. Monitore werden hinten angeschlossen.</p><p><strong>Wissenswertes</strong><br>GPUs sind besonders gut bei parallelen Rechnungen, d.h. wenn ganz oft die gleiche Rechnung (mit unterschiedlichen Werten) gemacht werden muss. Z.B. um die Pixel auf einem Bildschirm zu berechnen. GPUs sind wichtig für Gaming, Videoschnitt und künstliche Intelligenz.</p>', 
+                    source: '<a href="https://de.wikipedia.org/wiki/Datei:%E9%BB%91%E7%A5%9E%E8%AF%9D%EF%BC%9A%E6%82%9F%E7%A9%BA%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95%EF%BC%81%E9%9C%80%E8%A6%81%E4%BB%80%E4%B9%88%E6%98%BE%E5%8D%A1%E6%89%8D%E8%83%BD%E7%8E%A9%EF%BC%9F%28%E6%9E%81%E5%AE%A2%E6%B9%BEGeekerwan%29_%282160p_60fps_VP9-160kbit_Opus%29-00.00.18.325.png" target="_blank">Geekerwan, <em>GPU Performance Test Screenshot</em></a> - <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a>', 
+                    img: './images/gpu.png'  
+                },
+            'psu': { title: '6. Netzteil (PSU) & Stromkabel', 
+                    desc: '<p><strong>Weitere Bezeichnungen</strong><br> PSU (<em>Power Supply Unit</em>), Netzteil.</p><p><strong>Aufgabe</strong><br> Wandelt Wechselstrom aus der Steckdose in passende Gleichspannungen für Computerteile um und schützt oft vor Überlastung.</p><p><strong>Verbindung</strong><br> Liefert Strom per Kabel an Motherboard, CPU, Grafikkarte, Laufwerke und teils Lüfter.</p>', 
+                    source: '<a href="https://commons.wikimedia.org/wiki/File:PSU-gold-full_set.jpg" target="_blank">User: unknown, <em>PSU Gold Full Set</em></a> - <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">CC BY-SA 3.0</a>', 
+                    img: './images/psu.jpg'  
+                },
+            'ssd': { title: '7. Festplatte (SSD oder HDD) & Datenkabel', 
+                    desc: '<p><strong>Weitere Bezeichnungen</strong><br> SSD (<em>Solid State Drive</em>), HDD (<em>Hard Disk Drive</em>), Laufwerk, Massenspeicher.</p><p><strong>Aufgabe</strong><br> Speichert Betriebssystem, Programme und Dateien dauerhaft – auch ohne Strom.</p><p><strong>Verbindung</strong><br> Häufig per SATA-Kabel mit dem Motherboard verbunden, moderne SSDs oft direkt über M.2-Steckplatz.</p><p><strong>Wissenswertes</strong><br> Eine <strong>HDD</strong> speichert Daten magnetisch auf rotierenden Scheiben mit beweglichem Lesekopf. Sie ist günstiger pro Gigabyte, aber langsamer und empfindlicher gegen Stösse. Eine <strong>SSD</strong> speichert Daten in Speicherchips ohne bewegliche Teile. Sie ist viel schneller, leiser und robuster. HDDs dominierten jahrzehntelang PCs. SSDs wurden zuerst teuer eingesetzt und haben heute in vielen Computern die HDD als Systemlaufwerk ersetzt.</p>', 
+                    source: '<a href="https://commons.wikimedia.org/wiki/File:Maxtor_HDD_and_Intel_SSD_20100117.jpg" target="_blank">HDD/SSD comparison,<em>Maxtor HDD and Intel SSD</em></a> - <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC BY-SA 2.0</a>', 
+                    img: './images/hdd_ssd.jpg'  
+                },
+            'frontio': { title: '8. Front-Panel', 
+                    desc: '<p><strong>Weitere Bezeichnungen</strong><br> Front-Panel, Front I/O (<em>Input/Output</em>), Frontanschlüsse.</p><p><strong>Aufgabe</strong><br> Bietet leicht erreichbare Anschlüsse und Tasten an der Vorderseite des Gehäuses, z. B. Power, USB oder Audio.</p><p><strong>Verbindung</strong><br> Über interne Kabel mit Pins auf dem Motherboard verbunden. Tastendruck oder eingesteckte Geräte senden Signale direkt ans Mainboard.</p>', 
+                    source: '<a href="https://commons.wikimedia.org/wiki/File:Front_Panel_Audio_and_USB_ITX_Personal_Computer_Case_IMG_1798.JPG" target="_blank">Hans Haase, <em>Front Panel Audio and USB ITX Personal Computer Case</em></a> - <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a>', 
+                    img: './images/frontpanel.jpg'
+                }
         };
+
+
+        
 
         const presOrder = ['case', 'mb', 'cpu', 'ram', 'gpu', 'psu', 'ssd', 'frontio'];
         let isTourActive = false;
 
         // --- GLOBALE VARIABLEN ---
         let scene, camera, renderer, controls, raycaster, mouse;
-        
+
         const pcGroup = new THREE.Group();
-        const casePanels = [];          
-        const componentMeshes = {};     
-        const pickableObjects = [];     
-        const fans = [];                
-        let ghostCase;                  
-        
-        let caseState = 'closed'; 
+        const casePanels = [];
+        const componentMeshes = {};
+        const pickableObjects = [];
+        const fans = [];
+        let ghostCase;
+
+        let caseState = 'closed';
         let hoveredId = null;
+        let hoveredMesh = null;
         let clickedId = null;
 
         let isAnimatingCamera = false;
@@ -358,12 +550,17 @@
             scene.add(pcGroup);
             buildSidebar();
 
+            const lb = document.getElementById('lightbox');
+            document.getElementById('lightbox-close').addEventListener('click', () => lb.classList.remove('open'));
+            lb.addEventListener('click', e => { if (e.target === lb) lb.classList.remove('open'); });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+
             const abortCamera = () => { isAnimatingCamera = false; };
             canvasEl.addEventListener('pointerdown', abortCamera);
             canvasEl.addEventListener('wheel', abortCamera);
-            
+
             canvasEl.addEventListener('mousemove', onMouseMove);
-            
+
             let pointerDownPos = { x: 0, y: 0 };
             canvasEl.addEventListener('pointerdown', (e) => {
                 pointerDownPos.x = e.clientX;
@@ -387,19 +584,19 @@
                     updateCameraZoom();
                 }
             });
-            
+
             document.getElementById('btn-start').addEventListener('click', () => {
                 document.getElementById('start-screen').style.display = 'none';
                 document.getElementById('tour-screen').style.display = 'flex';
                 isTourActive = true;
-                
+
                 if (window.innerWidth <= 768) {
                     document.body.classList.add('mobile-panel-active');
                     document.body.classList.remove('mobile-3d-active');
                     updateCameraZoom();
                 }
-                
-                showPresStep('case'); 
+
+                showPresStep('case');
             });
 
             const resizeObserver = new ResizeObserver(() => { onWindowResize(); });
@@ -420,7 +617,7 @@
                 header.className = 'acc-header';
                 header.innerText = data.title;
                 header.onclick = () => {
-                    if(clickedId === id) deselectAll();
+                    if (clickedId === id && id !== 'case') deselectAll();
                     else showPresStep(id);
                 };
 
@@ -430,9 +627,21 @@
                 const content = document.createElement('div');
                 content.className = 'acc-content';
                 content.innerHTML = `
-                    <img class="info-img" src="BILD_LINK_HIER_EINFUEGEN.jpg" alt="Bild: ${data.title}">
+                    <figure>
+                        <img class="info-img" src="${data.img}" alt="Bild: ${data.title}">
+                        <figcaption class="fig-cap">Source: ${data.source}</figcaption>
+                    </figure>
                     <p>${data.desc}</p>
                 `;
+                const img = content.querySelector('.info-img');
+                img.addEventListener('click', () => {
+                    document.getElementById('lightbox-img').src = data.img;
+                    document.getElementById('lightbox-img').alt = data.title;
+                    document.getElementById('lightbox-title').textContent = data.title;
+                    document.getElementById('lightbox-caption').innerHTML = `Source: ${data.source}`;
+                    document.getElementById('lightbox-desc').innerHTML = `${data.desc}`
+                    document.getElementById('lightbox').classList.add('open');
+                });
 
                 body.appendChild(content);
                 item.appendChild(header);
@@ -449,9 +658,9 @@
         }
 
         function createBox(w, h, d, color, id) {
-            const mat = new THREE.MeshStandardMaterial({ 
-                color: color, roughness: 0.5, metalness: 0.3, 
-                transparent: true, opacity: 0.25 
+            const mat = new THREE.MeshStandardMaterial({
+                color: color, roughness: 0.5, metalness: 0.3,
+                transparent: true, opacity: 0.25
             });
             const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
             mesh.userData.origColor = color;
@@ -460,9 +669,9 @@
         }
 
         function createCylinder(rT, rB, h, s, color, id) {
-            const mat = new THREE.MeshStandardMaterial({ 
-                color: color, roughness: 0.6, 
-                transparent: true, opacity: 0.25 
+            const mat = new THREE.MeshStandardMaterial({
+                color: color, roughness: 0.6,
+                transparent: true, opacity: 0.25
             });
             const mesh = new THREE.Mesh(new THREE.CylinderGeometry(rT, rB, h, s), mat);
             mesh.userData.origColor = color;
@@ -472,12 +681,12 @@
 
         function createCable(points, radius, color, id) {
             const curve = new THREE.CatmullRomCurve3(points);
-            const mat = new THREE.MeshStandardMaterial({ 
-                color: color, transparent: true, opacity: 0.25 
+            const mat = new THREE.MeshStandardMaterial({
+                color: color, transparent: true, opacity: 0.25
             });
             const mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 48, radius, 8, false), mat);
             mesh.userData.origColor = color;
-            mesh.userData.curve = curve; 
+            mesh.userData.curve = curve;
             mesh.userData.cableRadius = radius; // Für Oberflächen-Datenbits
             if (id) registerComponentMesh(id, mesh);
             pcGroup.add(mesh);
@@ -486,18 +695,46 @@
 
         function buildComputer() {
             const w = 2.4, h = 4.8, d = 4.5;
-            
+
             // 1. MOTHERBOARD
             const mbGroup = new THREE.Group();
             const mbBase = createBox(0.1, 3.6, 3.0, colors.mb, 'mb');
-            mbBase.position.set(0.95, 0.4, -0.6); 
+            mbBase.position.set(0.95, 0.4, -0.6);
             mbGroup.add(mbBase);
 
             const ioShield = createBox(0.15, 1.4, 0.3, 0xaaaaaa, 'mb');
-            ioShield.position.set(0.95, 1.2, -2.25); 
-            ioShield.userData.isExternal = true; 
-            ioShield.userData.tooltipOnly = "Anschlüsse (Motherboard)"; 
+            ioShield.position.set(0.95, 1.2, -2.25);
+            ioShield.userData.isExternal = true;
+            ioShield.userData.tooltipOnly = "Anschlüsse (Motherboard)";
             mbGroup.add(ioShield);
+
+            // IO-Panel Anschlüsse (an der Rückwand, zeigen in -z Richtung)
+            const ioZ = -2.43, ioX = 0.95;
+            const mkIoP = (w, h, py, col) => {
+                const p = createBox(w, h, 0.04, col, 'mb');
+                p.position.set(ioX, py, ioZ);
+                p.userData.isExternal = true;
+                mbGroup.add(p);
+            };
+            mkIoP(0.09, 0.07, 1.78, 0x222222);   // LAN
+            mkIoP(0.07, 0.04, 1.66, 0x1144cc);   // USB 3.0
+            mkIoP(0.07, 0.04, 1.58, 0x1144cc);   // USB 3.0
+            mkIoP(0.07, 0.04, 1.47, 0x1144cc);   // USB 3.0
+            mkIoP(0.07, 0.04, 1.39, 0x1144cc);   // USB 3.0
+            mkIoP(0.045, 0.028, 1.28, 0x333333); // USB-C
+            mkIoP(0.09, 0.065, 1.14, 0x222222);  // DisplayPort (iGPU)
+            mkIoP(0.07, 0.04, 1.01, 0x111111);   // USB 2.0
+            mkIoP(0.07, 0.04, 0.93, 0x111111);   // USB 2.0
+            const mkAudio = (py, col) => {
+                const a = createCylinder(0.022, 0.022, 0.04, 8, col, 'mb');
+                a.rotation.x = Math.PI / 2;
+                a.position.set(ioX, py, ioZ);
+                a.userData.isExternal = true;
+                mbGroup.add(a);
+            };
+            mkAudio(0.82, 0x22aa22);  // Line-out
+            mkAudio(0.74, 0x111111);  // Line-in
+            mkAudio(0.66, 0xee3333);  // Mic
 
             const socket = createBox(0.12, 0.8, 0.8, 0x333333, 'mb');
             socket.position.set(0.92, 1.4, -1.0);
@@ -515,7 +752,7 @@
             pcGroup.add(cpu);
 
             // 3. RAM
-            for(let i=0; i<2; i++) {
+            for (let i = 0; i < 2; i++) {
                 const ram = createBox(0.18, 1.4, 0.1, colors.ram, 'ram');
                 ram.position.set(0.85, 1.4, -0.3 + (i * 0.25));
                 pcGroup.add(ram);
@@ -524,28 +761,42 @@
             // 4. GPU
             const gpuGroup = new THREE.Group();
             const gpuPCB = createBox(1.2, 0.1, 2.4, 0x222222, 'gpu');
-            gpuPCB.position.set(0.2, -0.2, -1.0); 
+            gpuPCB.position.set(0.2, -0.2, -1.0);
 
-            const gpuShroud = createBox(1.1, 0.4, 2.3, colors.gpu, 'gpu');
-            gpuShroud.position.set(0.2, -0.45, -1.0); 
-            
-            const gpuBracket = createBox(0.05, 0.6, 0.2, 0xaaaaaa, 'gpu');
-            gpuBracket.position.set(0.8, -0.3, -2.3); 
-            gpuBracket.userData.isExternal = true; 
-            gpuBracket.userData.tooltipOnly = "Anschlüsse (GPU)"; 
+            const gpuShroud = createBox(1.2, 0.4, 2.4, colors.gpu, 'gpu');
+            gpuShroud.position.set(0.2, -0.45, -1.0);
+
+            const gpuBracket = createBox(0.05, 1.1, 0.38, 0xaaaaaa, 'gpu');
+            gpuBracket.position.set(0.8, -0.55, -2.3);
+            gpuBracket.userData.isExternal = true;
+            gpuBracket.userData.tooltipOnly = "Anschlüsse (GPU)";
             gpuGroup.add(gpuBracket);
+
+            // GPU Anschlüsse (zeigen nach hinten raus, in -z Richtung)
+            const gpuZ = -2.52, gpuX = 0.8;
+            const mkGpuP = (w, h, py, col) => {
+                const p = createBox(w, h, 0.04, col, 'gpu');
+                p.position.set(gpuX, py, gpuZ);
+                p.userData.isExternal = true;
+                gpuGroup.add(p);
+            };
+            mkGpuP(0.14, 0.06, -0.28, 0x111111);  // HDMI
+            mkGpuP(0.10, 0.09, -0.43, 0x111111);  // DisplayPort
+            mkGpuP(0.10, 0.09, -0.58, 0x111111);  // DisplayPort
+            mkGpuP(0.10, 0.09, -0.73, 0x111111);  // DisplayPort
+            mkGpuP(0.045, 0.028, -0.88, 0x222222); // USB-C (Thunderbolt/DP)
 
             gpuGroup.add(gpuPCB);
             gpuGroup.add(gpuShroud);
 
-            for(let i=0; i<2; i++) {
+            for (let i = 0; i < 2; i++) {
                 const fan = createCylinder(0.4, 0.4, 0.05, 16, 0x111111, 'gpu');
                 fan.position.set(0.2, -0.68, -0.5 - (i * 1.0));
-                fan.userData.isFan = true; 
-                
-                const solidMat = new THREE.MeshStandardMaterial({ 
+                fan.userData.isFan = true;
+
+                const solidMat = new THREE.MeshStandardMaterial({
                     color: 0x000000, roughness: 0.8,
-                    polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 
+                    polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1
                 });
                 const solidMesh = new THREE.Mesh(fan.geometry, solidMat);
                 solidMesh.visible = false;
@@ -561,17 +812,19 @@
             const psuGroup = new THREE.Group();
             const psuBox = createBox(1.6, 1.2, 1.8, colors.psu, 'psu');
             psuBox.position.set(0.0, -1.8, -1.4);
-            psuBox.userData.isExternal = true; 
+            psuBox.userData.isExternal = true;
             psuGroup.add(psuBox);
-            
+
             const psuFan = createCylinder(0.5, 0.5, 0.05, 16, 0x111111, 'psu');
-            psuFan.position.set(0.0, -1.2, -1.4);
+            psuFan.rotation.x = Math.PI / 2;
+            psuFan.position.set(0.0, -1.8, -2.325);
             psuFan.userData.isExternal = true;
             psuFan.userData.isFan = true;
+            psuFan.userData.spinZ = true;
 
-            const psuSolidMat = new THREE.MeshStandardMaterial({ 
+            const psuSolidMat = new THREE.MeshStandardMaterial({
                 color: 0x000000, roughness: 0.8,
-                polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 
+                polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1
             });
             const psuSolidMesh = new THREE.Mesh(psuFan.geometry, psuSolidMat);
             psuSolidMesh.visible = false;
@@ -587,11 +840,11 @@
             const bayGeom = new THREE.BoxGeometry(1.2, 0.05, 1.6);
             const bayMat = new THREE.MeshStandardMaterial({ color: 0x999999, transparent: true, opacity: 0.25 });
             const bayBottom = new THREE.Mesh(bayGeom, bayMat);
-            bayBottom.position.set(0.2, -1.7, 1.4); 
+            bayBottom.position.set(0.2, -1.7, 1.4);
             pcGroup.add(bayBottom);
 
             const bayTop = new THREE.Mesh(bayGeom, bayMat);
-            bayTop.position.set(0.2, -1.45, 1.4); 
+            bayTop.position.set(0.2, -1.45, 1.4);
             pcGroup.add(bayTop);
 
             const ssd = createBox(1.0, 0.15, 1.4, colors.ssd, 'ssd');
@@ -600,33 +853,33 @@
 
             // 7. FRONT I/O (Ragt nun leicht aus dem Gehäuse (Z = 2.3) heraus, Gehäusefront ist bei Z = 2.25)
             const frontGroup = new THREE.Group();
-            
+
             const ioBlock = createBox(0.8, 1.4, 0.1, colors.frontio, 'frontio');
-            ioBlock.position.set(0.0, 1.3, 2.3); 
+            ioBlock.position.set(0.0, 1.3, 2.3);
             ioBlock.userData.isExternal = true; // Immer sichtbar
             frontGroup.add(ioBlock);
 
             const powerBtn = createBox(0.25, 0.25, 0.08, 0x111111, 'frontio');
-            powerBtn.position.set(0.2, 1.85, 2.35); 
+            powerBtn.position.set(0.2, 1.85, 2.35);
             powerBtn.userData.isExternal = true;
             frontGroup.add(powerBtn);
 
             const symMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
             const ringGeom = new THREE.TorusGeometry(0.06, 0.015, 8, 16);
             const ring = new THREE.Mesh(ringGeom, symMat);
-            ring.position.set(0.2, 1.85, 2.39); 
+            ring.position.set(0.2, 1.85, 2.39);
             frontGroup.add(ring);
-            
+
             const lineGeom = new THREE.BoxGeometry(0.02, 0.08, 0.01);
             const line = new THREE.Mesh(lineGeom, symMat);
-            line.position.set(0.2, 1.88, 2.39); 
+            line.position.set(0.2, 1.88, 2.39);
             frontGroup.add(line);
 
             const usb1 = createBox(0.12, 0.05, 0.05, 0x000000, 'frontio');
             usb1.position.set(-0.25, 1.5, 2.33);
             usb1.userData.isExternal = true;
             frontGroup.add(usb1);
-            
+
             const usb2 = createBox(0.12, 0.05, 0.05, 0x000000, 'frontio');
             usb2.position.set(-0.08, 1.5, 2.33);
             usb2.userData.isExternal = true;
@@ -653,90 +906,90 @@
             // Kabel vom Front Panel ins Motherboard (90 Grad andocken)
             createCable([
                 new THREE.Vector3(0.0, 1.0, 2.25), // Dockt an Rückseite von ioBlock (Z=2.3)
-                new THREE.Vector3(0.0, 1.0, 1.5),  
-                new THREE.Vector3(-0.6, -1.2, 1.5),   
-                new THREE.Vector3(-0.6, -1.2, 0.0),   
-                new THREE.Vector3(0.5, -1.2, 0.0),    
-                new THREE.Vector3(0.88, -1.2, 0.0) 
+                new THREE.Vector3(0.0, 1.0, 1.5),
+                new THREE.Vector3(-0.6, -1.2, 1.5),
+                new THREE.Vector3(-0.6, -1.2, 0.0),
+                new THREE.Vector3(0.5, -1.2, 0.0),
+                new THREE.Vector3(0.88, -1.2, 0.0)
             ], 0.04, 0x555555, 'frontio');
 
 
             // 8. KABEL
             // ACHTUNG: IDs wurden auf psu oder ssd geändert, damit sie als ein Bauteil gelten!
             createCable([
-                new THREE.Vector3(0.0, -1.2, -0.6), 
-                new THREE.Vector3(0.0, -0.9, -0.6), 
-                new THREE.Vector3(0.4, -0.8, 0.4),  
-                new THREE.Vector3(0.4, 0.4, 0.4),   
-                new THREE.Vector3(0.7, 0.4, 0.4),   
-                new THREE.Vector3(0.88, 0.4, 0.4)   
-            ], 0.08, colors.c_mb, 'psu'); // c_mb -> psu
+                new THREE.Vector3(0.0, -1.2, -0.6),
+                new THREE.Vector3(0.0, -0.9, -0.6),
+                new THREE.Vector3(0.4, -0.8, 0.4),
+                new THREE.Vector3(0.4, 0.4, 0.4),
+                new THREE.Vector3(0.7, 0.4, 0.4),
+                new THREE.Vector3(0.88, 0.4, 0.4)
+            ], 0.06, colors.c_mb, 'psu'); // c_mb -> psu
 
             createCable([
-                new THREE.Vector3(-0.4, -1.2, -0.8), 
-                new THREE.Vector3(-0.4, -0.9, -0.8), 
-                new THREE.Vector3(-0.8, -0.5, -0.8), 
-                new THREE.Vector3(-0.8, 1.7, -0.8),  
-                new THREE.Vector3(0.6, 1.7, -1.0),   
-                new THREE.Vector3(0.88, 1.7, -1.0)   
-            ], 0.05, colors.c_cpu, 'psu'); // c_cpu -> psu
+                new THREE.Vector3(-0.4, -1.2, -0.8),
+                new THREE.Vector3(-0.4, -0.9, -0.8),
+                new THREE.Vector3(-0.8, -0.5, -0.8),
+                new THREE.Vector3(-0.8, 1.7, -0.8),
+                new THREE.Vector3(0.6, 1.7, -1.0),
+                new THREE.Vector3(0.88, 1.7, -1.0)
+            ], 0.06, colors.c_cpu, 'psu'); // c_cpu -> psu
 
             createCable([
-                new THREE.Vector3(-0.25, -1.2, -0.7),  
-                new THREE.Vector3(-0.25, -0.9, -0.7),  
-                new THREE.Vector3(-0.6, -0.8, -0.2),  
-                new THREE.Vector3(-0.6, -0.2, 0.0),   
-                new THREE.Vector3(-0.4, -0.2, 0.0)    
+                new THREE.Vector3(-0.25, -1.2, -0.7),
+                new THREE.Vector3(-0.25, -0.9, -0.7),
+                new THREE.Vector3(-0.6, -0.8, -0.2),
+                new THREE.Vector3(-0.6, -0.2, 0.0),
+                new THREE.Vector3(-0.4, -0.2, 0.0)
             ], 0.06, colors.c_gpu, 'psu'); // c_gpu -> psu
 
             createCable([
-                new THREE.Vector3(0.88, -0.8, 0.8),   
-                new THREE.Vector3(0.6, -0.8, 0.8),    
-                new THREE.Vector3(0.6, -1.58, 0.5),   
-                new THREE.Vector3(0.2, -1.58, 0.5),   
-                new THREE.Vector3(0.2, -1.58, 0.7)    
+                new THREE.Vector3(0.88, -0.8, 0.8),
+                new THREE.Vector3(0.6, -0.8, 0.8),
+                new THREE.Vector3(0.6, -1.58, 0.5),
+                new THREE.Vector3(0.2, -1.58, 0.5),
+                new THREE.Vector3(0.2, -1.58, 0.7)
             ], 0.05, colors.c_ssd, 'ssd'); // c_ssd -> ssd
 
             createCable([
-                new THREE.Vector3(0.0, -1.8, -2.3),
-                new THREE.Vector3(0.0, -1.8, -3.5),
-                new THREE.Vector3(-1.0, -2.4, -5.0)
+                new THREE.Vector3(0.65, -2.2, -2.3),
+                new THREE.Vector3(0.65, -2.2, -3.2),
+                new THREE.Vector3(-0.5, -2.6, -5.0)
             ], 0.08, colors.c_ext, 'psu'); // c_ext -> psu
 
             // --- GEHÄUSE ---
             const addPanel = (pw, ph, pd, px, py, pz, ex, ey, ez) => {
                 const geom = new THREE.BoxGeometry(pw, ph, pd);
-                const mat = new THREE.MeshStandardMaterial({ 
-                    color: colors.case, roughness: 0.5, metalness: 0.3, 
-                    transparent: false, opacity: 1.0 
+                const mat = new THREE.MeshStandardMaterial({
+                    color: colors.case, roughness: 0.5, metalness: 0.3,
+                    transparent: false, opacity: 1.0
                 });
                 const mesh = new THREE.Mesh(geom, mat);
                 mesh.position.set(px, py, pz);
-                
+
                 // Explodiert nun VIEL weiter weg (* 1.8)
-                const openPos = new THREE.Vector3(px + (ex * 1.8), py + (ey * 1.8), pz + (ez * 1.8));
+                const openPos = new THREE.Vector3(px + (ex * 2), py + (ey * 2), pz + (ez * 2));
                 const panelObj = { mesh: mesh, closedPos: new THREE.Vector3(px, py, pz), openPos: openPos };
                 casePanels.push(panelObj);
                 pcGroup.add(mesh);
             };
 
             const t = 0.05;
-            addPanel(t, h, d, -w/2, 0, 0,    -4, 0, 0); 
-            addPanel(t, h, d, w/2, 0, 0,     4, 0, 0);  
-            addPanel(w, t, d, 0, h/2, 0,     0, 4, 0);  
-            addPanel(w, t, d, 0, -h/2, 0,    0, -1, 0); 
-            addPanel(w, h, t, 0, 0, d/2,     0, 0, 4);  
-            addPanel(w, h, t, 0, 0, -d/2,    0, 0, -2); 
+            addPanel(t, h, d, -w / 2, 0, 0, -4, 0, 0);
+            addPanel(t, h, d, w / 2, 0, 0, 4, 0, 0);
+            addPanel(w, t, d, 0, h / 2, 0, 0, 4, 0);
+            addPanel(w, t, d, 0, -h / 2, 0, 0, -1, 0);
+            addPanel(w, h, t, 0, 0, d / 2, 0, 0, 4);
+            addPanel(w, h, t, 0, 0, -d / 2, 0, 0, -2);
 
             // Ghost Case
             ghostCase = new THREE.Group();
             const ghostGeom = new THREE.BoxGeometry(w, h, d);
             const edgesGeom = new THREE.EdgesGeometry(ghostGeom);
             const ghostMat = new THREE.LineBasicMaterial({ color: 0x222222, transparent: true, opacity: 0 });
-            
+
             const offsets = [-0.005, 0, 0.005];
-            for(let ox of offsets) {
-                for(let oy of offsets) {
+            for (let ox of offsets) {
+                for (let oy of offsets) {
                     const line = new THREE.LineSegments(edgesGeom, ghostMat);
                     line.position.set(ox, oy, 0);
                     ghostCase.add(line);
@@ -751,7 +1004,7 @@
                 'cpu': { pos: new THREE.Vector3(-10, 6, 0), look: new THREE.Vector3(0.88, 1.4, -1.0) },
                 'ram': { pos: new THREE.Vector3(-10, 6, 1), look: new THREE.Vector3(0.85, 1.4, -0.3) },
                 'gpu': { pos: new THREE.Vector3(-12, 0, 3), look: new THREE.Vector3(0.2, -0.4, -1.0) },
-                'psu': { pos: new THREE.Vector3(-10, 4, -9), look: new THREE.Vector3(0.0, -1.8, -1.4) }, 
+                'psu': { pos: new THREE.Vector3(-10, 4, -9), look: new THREE.Vector3(0.0, -1.8, -1.4) },
                 'ssd': { pos: new THREE.Vector3(-11, -1, 7), look: new THREE.Vector3(0.2, -1.58, 1.4) },
                 'frontio': { pos: new THREE.Vector3(-8, 7, 11), look: new THREE.Vector3(0, 1.5, 2.25) },
                 'reset': { pos: new THREE.Vector3(-16, 10, 18), look: new THREE.Vector3(0, 0, 0) }
@@ -770,37 +1023,46 @@
         }
 
         function openCase() {
-            if(caseState === 'opened' || caseState === 'opening') return;
+            if (caseState === 'opened' || caseState === 'opening') return;
             caseState = 'opening';
-            casePanels.forEach(p => { 
-                p.mesh.visible = true; 
-                p.mesh.material.transparent = true; 
+            casePanels.forEach(p => {
+                p.mesh.visible = true;
+                p.mesh.material.transparent = true;
+                p.mesh.material.opacity = 1.0;
+                p.mesh.material.needsUpdate = true;
+                p.mesh.position.copy(p.closedPos);
             });
         }
 
         function closeCase() {
-            if(caseState === 'closed' || caseState === 'closing') return;
+            if (caseState === 'closed' || caseState === 'closing') return;
             caseState = 'closing';
-            casePanels.forEach(p => { p.mesh.visible = true; });
+            casePanels.forEach(p => {
+                p.mesh.visible = true;
+                p.mesh.material.transparent = true;
+                p.mesh.material.opacity = 0;
+                p.mesh.material.needsUpdate = true;
+            });
         }
 
         function updateMaterials() {
+            const overviewMode = isTourActive && clickedId === null;
             Object.keys(componentMeshes).forEach(id => {
                 const isHovered = (id === hoveredId);
                 const isClicked = (id === clickedId);
-                const shouldBeSolid = isHovered || isClicked;
-                
+                const shouldBeSolid = isHovered || isClicked || overviewMode;
+
                 componentMeshes[id].forEach(mesh => {
-                    if(mesh.userData.isFan) {
-                        mesh.material.wireframe = true; 
+                    if (mesh.userData.isFan) {
+                        mesh.material.wireframe = true;
                         const isCaseClosedExternal = (caseState === 'closed' && mesh.userData.isExternal);
-                        
-                        if(shouldBeSolid || isCaseClosedExternal) mesh.userData.solidBg.visible = true;
+
+                        if (shouldBeSolid || isCaseClosedExternal) mesh.userData.solidBg.visible = true;
                         else mesh.userData.solidBg.visible = false;
 
-                        if(shouldBeSolid) {
-                            mesh.material.color.setHex(0xaaaaaa); 
-                            mesh.material.emissive.setHex(0x555555); 
+                        if (shouldBeSolid) {
+                            mesh.material.color.setHex(0xaaaaaa);
+                            mesh.material.emissive.setHex(0x555555);
                             mesh.material.opacity = 1.0;
                         } else {
                             mesh.material.color.setHex(mesh.userData.origColor);
@@ -811,14 +1073,14 @@
                     }
 
                     mesh.material.wireframe = false;
-                    
-                    if(shouldBeSolid || (caseState === 'closed' && mesh.userData.isExternal)) {
+
+                    if (shouldBeSolid || (caseState === 'closed' && mesh.userData.isExternal)) {
                         mesh.material.opacity = 1.0;
                     } else {
                         mesh.material.opacity = 0.25;
                     }
 
-                    if(shouldBeSolid) {
+                    if (shouldBeSolid) {
                         mesh.material.emissive.setHex(mesh.material.color.getHex());
                     } else {
                         mesh.material.emissiveIntensity = 0;
@@ -833,18 +1095,19 @@
 
             document.querySelectorAll('.acc-item').forEach(el => el.classList.remove('active'));
             const activeAcc = document.getElementById('acc-' + clickedId);
-            if(activeAcc) {
+            if (activeAcc) {
                 activeAcc.classList.add('active');
                 setTimeout(() => {
                     activeAcc.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 100);
             }
 
-            if(clickedId === 'case') closeCase();
+            if (clickedId === 'case') closeCase();
             else openCase();
 
             pulseGroup.clear();
             activePulses.length = 0;
+            preFillForId(clickedId);
             updateMaterials();
         }
 
@@ -854,18 +1117,45 @@
             moveCameraTo('reset');
             pulseGroup.clear();
             activePulses.length = 0;
+            preFillAll();
             updateMaterials();
         }
 
+        function getScreenPos(mesh) {
+            const wp = new THREE.Vector3();
+            mesh.getWorldPosition(wp);
+            wp.project(camera);
+            const rect = canvasEl.getBoundingClientRect();
+            return {
+                x: (wp.x + 1) / 2 * rect.width + rect.left,
+                y: -(wp.y - 1) / 2 * rect.height + rect.top
+            };
+        }
+
+        function preFillForId(id) {
+            const type = (id === 'psu') ? 'power' : 'data';
+            const count = 7;
+            componentMeshes[id] && componentMeshes[id].forEach(mesh => {
+                if (!mesh.userData.curve) return;
+                for (let i = 0; i < count; i++) spawnPulse(mesh, type, i / count);
+            });
+        }
+
+        function preFillAll() {
+            preFillForId('psu');
+            preFillForId('ssd');
+            preFillForId('frontio');
+        }
+
         // --- PULS ANIMATIONEN (KABEL) ---
-        function spawnPulse(cableMesh, type) {
+        function spawnPulse(cableMesh, type, startT = null) {
             const curve = cableMesh.userData.curve;
-            if(!curve) return;
+            if (!curve) return;
 
             let mesh, speed, dir;
 
             if (type === 'power') {
-                const r = (cableMesh.userData.cableRadius || 0.06) * 1.4;
+                const r = (cableMesh.userData.cableRadius || 0.06) + 0.005;
                 const core = new THREE.Mesh(
                     new THREE.SphereGeometry(r, 8, 8),
                     new THREE.MeshBasicMaterial({
@@ -889,18 +1179,18 @@
                 speed = 0.005;
                 dir = (cableMesh.userData.origColor === colors.c_ext) ? -1 : 1;
             } else if (type === 'data') {
-                // Daten-Bits flitzen auf der Außenhülle!
+                // Daten-Bits flitzen auf der Aussenhülle!
                 mesh = new THREE.Mesh(
                     new THREE.SphereGeometry(0.02, 8, 8),
-                    new THREE.MeshBasicMaterial({ 
+                    new THREE.MeshBasicMaterial({
                         color: 0x00e5ff,
                         transparent: true,
-                        blending: THREE.AdditiveBlending 
+                        blending: THREE.AdditiveBlending
                     })
                 );
-                speed = 0.015; 
-                dir = Math.random() > 0.5 ? 1 : -1; 
-                
+                speed = 0.015;
+                dir = Math.random() > 0.5 ? 1 : -1;
+
                 // Offset berechnen (Radius + leicht darüber)
                 const radius = cableMesh.userData.cableRadius + 0.01;
                 const angle = Math.random() * Math.PI * 2;
@@ -911,17 +1201,18 @@
             pulseGroup.add(mesh);
             activePulses.push({
                 mesh: mesh, curve: curve,
-                t: dir === 1 ? 0 : 1,
+                t: startT !== null ? startT : (dir === 1 ? 0 : 1),
                 speed: speed, dir: dir, type: type
             });
         }
 
         function onMouseMove(event) {
-            if(!isTourActive) return;
+            if (!isTourActive) return;
 
             const rect = canvasEl.getBoundingClientRect();
-            if(event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {
+            if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {
                 hoveredId = null;
+                hoveredMesh = null;
                 document.getElementById('tooltip').style.opacity = 0;
                 document.body.style.cursor = 'default';
                 updateMaterials();
@@ -936,27 +1227,22 @@
 
             if (intersects.length > 0) {
                 const hit = intersects[0].object;
-                
+                hoveredMesh = hit;
+                const tt = document.getElementById('tooltip');
                 if (hit.userData.tooltipOnly) {
-                    const tt = document.getElementById('tooltip');
                     tt.innerText = hit.userData.tooltipOnly;
-                    tt.style.left = event.clientX + 'px';
-                    tt.style.top = event.clientY + 'px';
                     tt.style.opacity = 1;
                     document.body.style.cursor = 'default';
                     hoveredId = null;
                 } else {
                     hoveredId = hit.userData.compId;
                     document.body.style.cursor = 'pointer';
-
-                    const tt = document.getElementById('tooltip');
                     tt.innerText = compData[hoveredId].title.replace(/^\d+\.\s*/, '');
-                    tt.style.left = event.clientX + 'px';
-                    tt.style.top = event.clientY + 'px';
                     tt.style.opacity = 1;
                 }
             } else {
                 hoveredId = null;
+                hoveredMesh = null;
                 document.body.style.cursor = 'default';
                 document.getElementById('tooltip').style.opacity = 0;
             }
@@ -964,29 +1250,29 @@
         }
 
         function onClick(event) {
-            if(!isTourActive) return;
+            if (!isTourActive) return;
             const rect = canvasEl.getBoundingClientRect();
-            if(event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) return;
+            if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) return;
 
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(pickableObjects.filter(m => m.visible));
 
-            if (intersects.length > 0 && !intersects[0].object.userData.tooltipOnly) {
-                const hitId = intersects[0].object.userData.compId;
-                if(hitId === clickedId) {
-                    deselectAll(); // Klick auf selbes -> schließen
-                } else {
-                    showPresStep(hitId);
+            if (intersects.length > 0) {
+                if (!intersects[0].object.userData.tooltipOnly) {
+                    const hitId = intersects[0].object.userData.compId;
+                    if (hitId === clickedId) deselectAll();
+                    else showPresStep(hitId);
                 }
+                // tooltipOnly: do nothing
             } else {
                 deselectAll();
             }
         }
 
         function updateCameraZoom() {
-            if(window.innerWidth <= 768) {
+            if (window.innerWidth <= 768) {
                 if (document.body.classList.contains('mobile-panel-active')) {
-                    camera.zoom = 1.3; 
+                    camera.zoom = 1.3;
                 } else {
                     camera.zoom = 1.0;
                 }
@@ -1009,13 +1295,13 @@
             requestAnimationFrame(animate);
 
             if (isAnimatingCamera) {
-                camAnimProgress += 0.025; 
+                camAnimProgress += 0.025;
                 if (camAnimProgress >= 1) {
                     camAnimProgress = 1;
                     isAnimatingCamera = false;
                 }
-                const t = camAnimProgress < 0.5 
-                    ? 4 * camAnimProgress * camAnimProgress * camAnimProgress 
+                const t = camAnimProgress < 0.5
+                    ? 4 * camAnimProgress * camAnimProgress * camAnimProgress
                     : 1 - Math.pow(-2 * camAnimProgress + 2, 3) / 2;
 
                 camera.position.lerpVectors(camStartPos, camTargetPos, t);
@@ -1023,48 +1309,67 @@
             }
 
             controls.update();
-            fans.forEach(fan => fan.rotation.y += 0.2);
+            fans.forEach(fan => {
+                fan.rotation.y += 0.5;
+            });
 
-            // Pulsierendes Leuchten (Kabel pulsieren NICHT im Material, sondern haben fließende Partikel)
+            // Pulsierendes Leuchten (Kabel pulsieren NICHT im Material, sondern haben fliessende Partikel)
             if (clickedId && componentMeshes[clickedId]) {
                 componentMeshes[clickedId].forEach(mesh => {
-                    if(!mesh.userData.isFan && !mesh.userData.curve) {
-                        mesh.material.emissiveIntensity = 0.4 + Math.sin(performance.now() * 0.012) * 0.2; 
+                    if (!mesh.userData.isFan && !mesh.userData.curve) {
+                        mesh.material.emissiveIntensity = 0.4 + Math.sin(performance.now() * 0.012) * 0.2;
                     }
                 });
             }
             if (hoveredId && hoveredId !== clickedId && componentMeshes[hoveredId]) {
                 componentMeshes[hoveredId].forEach(mesh => {
-                    if(!mesh.userData.isFan && !mesh.userData.curve) {
+                    if (!mesh.userData.isFan && !mesh.userData.curve) {
                         mesh.material.emissiveIntensity = 0.25;
                     }
                 });
             }
+            casePanels.forEach(p => {
+                if (clickedId === 'case') {
+                    p.mesh.material.emissive.setHex(colors.case);
+                    p.mesh.material.emissiveIntensity = 0.4 + Math.sin(performance.now() * 0.012) * 0.2;
+                } else {
+                    p.mesh.material.emissiveIntensity = 0;
+                }
+            });
 
             // --- Kabel Pulse Updates ---
             frameCount++;
-            if (clickedId === 'psu') {
+            if (clickedId === 'psu' || clickedId === null) {
                 if (frameCount % 20 === 0) {
-                    componentMeshes['psu'].forEach(mesh => {
-                        if(mesh.userData.curve) spawnPulse(mesh, 'power');
+                    componentMeshes['psu'] && componentMeshes['psu'].forEach(mesh => {
+                        if (mesh.userData.curve) spawnPulse(mesh, 'power');
                     });
                 }
             }
-            if (clickedId === 'ssd' || clickedId === 'frontio') {
-                if (Date.now() > nextDataBurst) {
-                    if (Math.random() > 0.6) {
-                        componentMeshes[clickedId].forEach(mesh => {
-                            if(mesh.userData.curve) spawnPulse(mesh, 'data');
+            const dataSources = clickedId === null ? ['ssd', 'frontio'] : (clickedId === 'ssd' || clickedId === 'frontio') ? [clickedId] : [];
+            if (dataSources.length > 0 && Date.now() > nextDataBurst) {
+                if (Math.random() > 0.6) {
+                    dataSources.forEach(cid => {
+                        componentMeshes[cid] && componentMeshes[cid].forEach(mesh => {
+                            if (mesh.userData.curve) spawnPulse(mesh, 'data');
                         });
-                    }
-                    if (Math.random() > 0.95) nextDataBurst = Date.now() + 400;
+                    });
                 }
+                if (Math.random() > 0.95) nextDataBurst = Date.now() + 400;
+            }
+
+            // Tooltip an 3D-Position heften
+            if (hoveredMesh) {
+                const sp = getScreenPos(hoveredMesh);
+                const tt = document.getElementById('tooltip');
+                tt.style.left = sp.x + 'px';
+                tt.style.top = (sp.y - 48) + 'px';
             }
 
             for (let i = activePulses.length - 1; i >= 0; i--) {
                 const p = activePulses[i];
                 p.t += p.speed * p.dir;
-                
+
                 if (p.t < 0 || p.t > 1) {
                     pulseGroup.remove(p.mesh);
                     activePulses.splice(i, 1);
@@ -1078,19 +1383,19 @@
                     const tangent = p.curve.getTangentAt(p.t);
                     // Hilfsvektor für Rotation
                     const axis = new THREE.Vector3(0, 1, 0);
-                    if (Math.abs(tangent.y) > 0.9) axis.set(1, 0, 0); 
-                    
+                    if (Math.abs(tangent.y) > 0.9) axis.set(1, 0, 0);
+
                     const normal = new THREE.Vector3().crossVectors(tangent, axis).normalize();
                     const binormal = new THREE.Vector3().crossVectors(tangent, normal).normalize();
 
                     // Offset-Berechnung mittels Kreisgleichung
                     const r = p.mesh.userData.offsetRadius;
                     const a = p.mesh.userData.offsetAngle;
-                    
+
                     const offset = new THREE.Vector3();
                     offset.addScaledVector(normal, Math.cos(a) * r);
                     offset.addScaledVector(binormal, Math.sin(a) * r);
-                    
+
                     p.mesh.position.copy(pos).add(offset);
                 } else {
                     // Stromkugeln bleiben mittig im Kabel
@@ -1105,9 +1410,8 @@
                     ghostCase.children.forEach(c => c.material.opacity += 0.02);
                 }
                 casePanels.forEach(p => {
-                    // Schneller und doppelt so weit explodieren!
-                    p.mesh.position.lerp(p.openPos, 0.1); 
-                    p.mesh.material.opacity -= 0.05; // Schneller faden
+                    p.mesh.position.lerp(p.openPos, 0.05);
+                    p.mesh.material.opacity -= 0.04;
                     if (p.mesh.position.distanceTo(p.openPos) > 0.1) allDone = false;
                 });
                 if (allDone) {
@@ -1121,7 +1425,7 @@
                 }
                 casePanels.forEach(p => {
                     p.mesh.material.opacity += 0.05;
-                    if(p.mesh.material.opacity > 1) {
+                    if (p.mesh.material.opacity > 1) {
                         p.mesh.material.opacity = 1;
                         p.mesh.material.transparent = false; // Solid wenn zu
                     }
@@ -1130,7 +1434,7 @@
                 });
                 if (allDone) {
                     caseState = 'closed';
-                    updateMaterials(); 
+                    updateMaterials();
                 }
             }
 
@@ -1138,4 +1442,5 @@
         }
     </script>
 </body>
+
 </html>
