@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="de">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Lektion 1 - Shortcuts</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <main>
+            <h1>Lektion 1: Shortcuts & deine erste Webseite</h1>
+
+            <h2>Aufgabe 1: Theorie-Vorbereitung</h2>
+            <h3>Schritt 1: Was ist eigentlich dieses HTML?</h3>
+            <p>
+                Du wirst gleich deine erste eigene kleine Webseite
+                programmieren. Dazu nutzen wir eine Computersprache namens
+                <strong>HTML</strong>. Bevor wir loslegen, müssen wir verstehen,
+                was diese Sprache eigentlich macht.
+            </p>
+            <p>Finde es heraus! Nutze dafür die Schul-KI.</p>
+            <ol>
+                <li>
+                    Gehe im Browser auf <code>office.com</code> und öffne dort
+                    <strong>Copilot</strong> (oder eine andere KI, die du nutzen
+                    darfst).
+                </li>
+                <li>
+                    Stelle der KI eine Frage in etwa wie diese:
+                    <p>
+                        <em
+                            >"Ich lerne gerade Webseiten zu bauen. Erkläre mir
+                            ganz einfach: Was ist HTML? Warum sagt man, HTML ist
+                            nur für die 'Struktur' und die 'Bedeutung'
+                            (Semantik) eines Textes zuständig, aber nicht für
+                            das Aussehen? Was macht der Webbrowser mit dem
+                            HTML-Code? Zeige mir ein ganz kurzes Beispiel."</em
+                        >
+                    </p>
+                </li>
+            </ol>
+            <p>
+                <strong>Deine Aufgabe:</strong> Öffne den ganz einfachen
+                Text-Editor von Windows und schreibe in deinen eigenen Worten
+                auf, was HTML ist und warum
+                <strong>Struktur und Semantik</strong> für
+                Screenreader-Nutzer:innen viel wichtiger sind als das optische
+                Design. Speichere das Dokument unter
+                <code>theorie.txt</code> ab. (Lass das Dokument danach offen,
+                wir brauchen es gleich noch einmal).
+            </p>
+
+            <details>
+                <summary>
+                    <strong
+                        >Wie öffne ich den Editor und speichere die Datei?
+                        (Ausklappen)</strong
+                    >
+                </summary>
+                <ol>
+                    <li>
+                        Drücke die <strong>Windows-Taste</strong> auf deiner
+                        Tastatur. Dein Screenreader sollte dir nun sagen, dass
+                        du dich in einem Suchfeld befindest.
+                    </li>
+                    <li>
+                        Tippe das Wort <strong>Editor</strong> (manchmal heisst
+                        es auch "Notepad") ein und drücke die
+                        <strong>Enter-Taste</strong>. Das Programm öffnet sich
+                        und du kannst sofort lostippen.
+                    </li>
+                    <li>Schreibe deine Antworten auf.</li>
+                    <li>
+                        Drücke zum Speichern die Tasten
+                        <strong>Ctrl + S</strong> (oder Strg + S). Das
+                        "Speichern unter"-Fenster öffnet sich. Dein Cursor
+                        blinkt automatisch im Feld für den Dateinamen.
+                    </li>
+                    <li>
+                        Tippe exakt <code>theorie.txt</code> ein.
+                        <em
+                            >Tipp: Lass dir hier von deiner Begleitperson kurz
+                            helfen, um sicherzugehen, dass ihr die Datei an
+                            einem guten Ort speichert (z.B. auf dem Desktop in
+                            einem neuen Ordner "Informatik"). <br />
+                            Wenn man die Endung (.txt, .html, usw.) selbst
+                            eintippt, ist es wichtig bei Dateityp "alle Dateien"
+                            auszuwählen.</em
+                        >
+                    </li>
+                    <li>
+                        Drücke <strong>Enter</strong>, um das Speichern
+                        abzuschliessen.
+                    </li>
+                </ol>
+            </details>
+
+            <h3>Schritt 2: Wo ist eigentlich meine Webseite?</h3>
+            <p>
+                Jetzt weisst du, was HTML ist. Du wirst gleich lokal auf deinem
+                Computer eine HTML-Datei basteln. Aber kann die ganze Welt diese
+                Seite dann sehen? (Spoiler: nein, wird sie nicht. Aber wieso
+                nicht?)
+            </p>
+            <p>Frage noch einmal die KI:</p>
+            <p>
+                <em
+                    >"Meine Lehrperson hat gesagt, ich werde gleich eine
+                    Webseite basteln. Er meinte, wir tun dies nur lokal. Was
+                    heisst das genau? Wenn ich jetzt eine HTML-Datei auf meinem
+                    Computer erstelle, ist diese Webpage dann im Internet
+                    ersichtlich? Was genau müsste ich machen, damit meine Eltern
+                    von zu Hause aus Zugang dazu haben? Was ist ein Server und
+                    was ist eine Domain? Erkläre es mir ganz einfach."</em
+                >
+            </p>
+
+            <p>
+                <strong>Deine Aufgabe:</strong> Gehe zurück in deine geöffnete
+                Datei <code>theorie.txt</code> und ergänze in deinen eigenen
+                Worten, was ein <strong>Server</strong> und was eine
+                <strong>Domain</strong> ist. Speichere die Datei. Benutze dieses
+                Dokument auch weiterhin, um Fragen und Unklarheiten zu notieren!
+                Deine Lehrperson wird dich am Ende der Stunde danach fragen.
+            </p>
+
+            <h2>Aufgabe 2: Spickzettel als HTML-Dokument</h2>
+            <p>
+                Dies ist die eigentliche Hauptaufgabe. Sie besteht aus mehreren
+                Teilaufgaben. Vergiss nicht, falls was unklar ist, kannst du
+                immer wieder auf office.com den Copilot oder irgend eine andere
+                KI fragen.
+            </p>
+            <h3>Schritt 1: Vorbereitung deines Spickzettels</h3>
+            <p>
+                In der Informatik merkt sich niemand alle Befehle auswendig.
+                Profis schreiben sich die wichtigsten Tastenkürzel (Shortcuts)
+                auf einen Spickzettel (englisch: Cheat-Sheet). Du baust dir nun
+                deinen eigenen Spickzettel als HTML-Webseite.
+            </p>
+
+            <p>
+                Wenn du einfach auf den Link unten klickst, öffnet sich eine
+                leere Seite im Browser. Das bringt uns nichts, denn du musst sie
+                bearbeiten können. Wir müssen die Datei erst richtig auf deinem
+                Computer speichern!
+            </p>
+
+            <details>
+                <summary>
+                    <strong
+                        >Klicke hier für die genaue Anleitung zum Speichern
+                        (Ausklappen)</strong
+                    >
+                </summary>
+                <ol>
+                    <li>
+                        Rechtsklick auf dem Link. (Oder noch besser: finde
+                        heraus, wie das nur mit Tasten geht!)
+                    </li>
+                    <li>
+                        Wähle "Ziel speichern unter..." oder "Link speichern
+                        unter...".
+                    </li>
+                    <li>
+                        <strong>Ganz wichtig:</strong> Speichere die Datei an
+                        einem Ort, den du wiederfindest! Zum Beispiel auf dem
+                        Schreibtisch (Desktop) in einem neuen Ordner namens
+                        "Informatik".
+                    </li>
+                </ol>
+            </details>
+
+            <div class="box">
+                <p>
+                    <a href="cheat-sheet-vorlage.html"
+                        >Hier ist der Link zur Vorlage
+                        (cheat-sheet-vorlage.html)</a
+                    >
+                </p>
+            </div>
+
+            <h3>Schritt 2: Der Entwicklungs-Zyklus (Zwei Programme)</h3>
+            <p>
+                Wie du gerade in der Theorie gelernt hast, liegt diese Datei nun
+                <strong>lokal auf deinem Computer</strong>. Um sie zu
+                bearbeiten, musst du sie nun in
+                <strong>zwei verschiedenen Programmen gleichzeitig</strong>
+                öffnen.
+            </p>
+            <ul>
+                <li>
+                    <strong>Der Text-Editor (Notepad):</strong> Hier schreibst
+                    du den Code. Das ist der Maschinenraum.
+                </li>
+                <li>
+                    <strong>Der Browser (Firefox/Chrome/Edge):</strong> Hier
+                    schaust du dir an, wie die Seite aussieht und wie der
+                    Screenreader sie vorliest. (Der Browser liest die
+                    Semantik!).
+                </li>
+            </ul>
+
+            <details>
+                <summary>
+                    <strong
+                        >Wie öffne ich die Datei im Text-Editor?
+                        (Ausklappen)</strong
+                    >
+                </summary>
+                <p>
+                    Gehe in deinen Ordner, in dem du die Datei gespeichert hast.
+                    Ein normaler Klick öffnet sie im Browser (das ist gut, lass
+                    sie dort offen). Um sie zusätzlich, im Editor zu öffnen,
+                    gehst du nochmals (ohne den Browser zu schliessen!) zum
+                    Ordner, in dem du die Datei gespeichert hast. Drücke nun die
+                    Rechtsklick-Taste auf der Datei und wähle "Öffnen mit...".
+                    Wähle dort "Editor".
+                </p>
+            </details>
+
+            <p>
+                Wir bauen nun die Grundstruktur. Schreibe im
+                <strong>Text-Editor</strong> den folgenden HTML-Code. Vergiss
+                die spitzen Klammern nicht!
+            </p>
+            <ol>
+                <li>
+                    Erstelle eine Hauptüberschrift:
+                    <code>&lt;h1&gt;Mein Cheat-Sheet&lt;/h1&gt;</code>
+                </li>
+                <li>
+                    Erstelle eine kleinere Überschrift:
+                    <code>&lt;h2&gt;Browser&lt;/h2&gt;</code>
+                </li>
+                <li>
+                    Erstelle noch eine kleinere Überschrift:
+                    <code>&lt;h2&gt;Screenreader&lt;/h2&gt;</code>
+                </li>
+            </ol>
+
+            <details>
+                <summary>
+                    <strong
+                        >Der wichtigste Ablauf der Welt: Der Speicher-Kreislauf
+                        (Ausklappen)</strong
+                    >
+                </summary>
+                <p>
+                    Wenn du im Editor etwas getippt hast, musst du 3 Schritte
+                    tun, um das Ergebnis zu sehen:
+                </p>
+                <ul>
+                    <li>
+                        <strong>1. Speichern:</strong> Drücke im Editor
+                        <code>Ctrl + S</code>.
+                    </li>
+                    <li>
+                        <strong>2. Fenster wechseln:</strong> Wechsle mit
+                        <code>Alt + Tab</code> rüber zum Browser.
+                    </li>
+                    <li>
+                        <strong>3. Neuladen:</strong> Drücke im Browser
+                        <code>F5</code>, um die Seite neu zu laden. Jetzt sollte
+                        dein Screenreader die neuen Überschriften finden!
+                    </li>
+                </ul>
+            </details>
+
+            <h3>Schritt 3: Die Basis-Shortcuts eintragen</h3>
+            <p>
+                Damit du gleich selbst im Internet recherchieren kannst, schenke
+                ich dir die wichtigsten Basis-Shortcuts. Trage diese nun in
+                deinen Spickzettel ein.
+            </p>
+
+            <p>
+                Unter deiner Überschrift "Browser" legst du eine Liste an. Eine
+                Liste startet in HTML mit <code>&lt;ul&gt;</code>. Jeder Eintrag
+                bekommt ein <code>&lt;li&gt;</code>. Am Ende schliesst man die
+                Liste mit <code>&lt;/ul&gt;</code>.
+            </p>
+
+            <p><strong>Schreibe Folgendes in den Editor:</strong></p>
+            <p>
+                <code>&lt;ul&gt;</code><br />
+                <code>&lt;li&gt;Neuen Tab öffnen: Ctrl + T&lt;/li&gt;</code
+                ><br />
+                <code
+                    >&lt;li&gt;In die Adresszeile springen: Ctrl + L (oder Alt +
+                    D)&lt;/li&gt;</code
+                ><br />
+                <code>&lt;/ul&gt;</code>
+            </p>
+
+            <p>
+                Wiederhole das Gleiche unter der Überschrift "Screenreader".
+                Trage diese zwei Befehle als Liste ein:
+            </p>
+            <p>
+                <code>&lt;ul&gt;</code><br />
+                <code
+                    >&lt;li&gt;Zur nächsten Überschrift springen:
+                    H&lt;/li&gt;</code
+                ><br />
+                <code>&lt;li&gt;Zur nächsten Liste springen: L&lt;/li&gt;</code
+                ><br />
+                <code>&lt;/ul&gt;</code>
+            </p>
+
+            <p>
+                Mache den Speicher-Kreislauf aus Schritt 2: Speichern, zum
+                Browser rüberwechseln, F5 drücken. Du solltest nun die neuen
+                Einträge auf der Webseite sehen. Hat alles geklappt?
+            </p>
+
+            <h3>Schritt 4: Deine Recherche-Missionen</h3>
+            <p>
+                Jetzt bist du dran! Du kennst nun die Shortcuts, um schnell im
+                Internet zu suchen. Dein Recherche-Ablauf sieht ab jetzt immer
+                so aus:
+            </p>
+            <ol>
+                <li>Neuen Tab öffnen (<code>Ctrl + T</code>)</li>
+                <li>In die Adresszeile springen (<code>Ctrl + L</code>)</li>
+                <li>Deine Frage eintippen und Enter drücken.</li>
+                <li>
+                    Die Lösung lesen, in deinen Text-Editor wechseln (<code
+                        >Alt + Tab</code
+                    >) und als neues <code>&lt;li&gt;</code> eintragen!
+                </li>
+            </ol>
+
+            <h4>Teil A: Browser-Shortcuts finden</h4>
+            <p>
+                Finde die Tastaturkürzel für folgende Aktionen heraus und
+                ergänze sie in deiner Browser-Liste:
+            </p>
+            <ul>
+                <li>
+                    <strong>Mission 1:</strong> Wie schliesst man einen
+                    einzelnen Tab im Browser?
+                </li>
+                <li>
+                    <strong>Mission 2:</strong> Wie holt man einen Tab zurück,
+                    den man aus Versehen gerade geschlossen hat?
+                </li>
+                <li>
+                    <strong>Mission 3:</strong> Wie setzt man ein Lesezeichen
+                    (Bookmark) für eine Webseite?
+                </li>
+            </ul>
+
+            <h4>Teil B: Screenreader-Shortcuts finden</h4>
+            <p>
+                Suche nun im Internet nach den Kürzeln für deinen speziellen
+                Screenreader (z.B. NVDA oder JAWS) und ergänze deine
+                Screenreader-Liste:
+            </p>
+            <ul>
+                <li>
+                    <strong>Mission 4:</strong> Wie öffne ich die Elementliste
+                    (eine Übersicht aller Links und Überschriften)?
+                </li>
+                <li>
+                    <strong>Mission 5:</strong> Mit welcher Taste kann ich die
+                    Sprachausgabe sofort pausieren (damit der Screenreader kurz
+                    ruhig ist, ohne ihn ganz abzuschalten)?
+                </li>
+            </ul>
+
+            <h3>Schritt 5: Bonus (Falls noch Zeit übrig ist)</h3>
+            <p>
+                Bist du schnell fertig geworden? Dann machen wir aus dir jetzt
+                einen richtigen Computer-Profi. Erstelle im Editor ganz unten
+                eine neue Überschrift:
+                <code>&lt;h2&gt;Windows & Computer&lt;/h2&gt;</code>.
+            </p>
+            <p>
+                Recherchiere die Shortcuts für folgende Aktionen und trage sie
+                als Liste ein:
+            </p>
+            <ul>
+                <li>Einen Text kopieren</li>
+                <li>Einen Text einfügen</li>
+                <li>Einen Fehler rückgängig machen</li>
+                <li>Alles markieren</li>
+                <li>Den Desktop (Schreibtisch) sofort anzeigen</li>
+                <li>
+                    Ein Programm komplett beenden (nicht nur das Fenster
+                    schliessen)
+                </li>
+            </ul>
+
+            <h2>Abschluss</h2>
+            <p>Schreib noch eine kurze Reflexion in dein theorie.txt.</p>
+            <ul>
+                <li>
+                    Was sind die wichtigsten Dinge, die du heute gelernt hast?
+                </li>
+                <li>
+                    Welche Tastaturkürzel denkst du, werden dir im Alltag am
+                    meisten bringen?
+                </li>
+                <li>
+                    Hast du verstanden, was ein HTML-Dokument ist und wie es
+                    sich von einem optisch formatierten Word-Dokument
+                    unterscheidet?
+                </li>
+            </ul>
+            <p>
+                Wenn du alles gespeichert hast, bist du für heute fertig.
+                Glückwunsch!
+            </p>
+            <p><a href="index.html">Zurück zur Startseite</a></p>
+        </main>
+    </body>
+</html>

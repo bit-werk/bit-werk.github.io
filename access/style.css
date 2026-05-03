@@ -1,0 +1,55 @@
+/* style.css */
+body {
+    background-color: #121212; /* Sehr dunkles Grau, blendet nicht */
+    color: #ffffe0; /* Helles Gelb für maximalen, weichen Kontrast */
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 28px; /* Sehr große Grundschrift */
+    line-height: 1.6;
+    margin: 0 auto;
+    max-width: 900px;
+    padding: 20px;
+}
+
+h1,
+h2,
+h3 {
+    color: #ffffff; /* Reines Weiß für Überschriften zur Abhebung */
+    border-bottom: 2px solid #54b4d3;
+    padding-bottom: 5px;
+}
+
+a {
+    color: #54b4d3; /* Helles Blau für Links */
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+/* Extrem wichtig für Tastaturnavigation: Sichtbarer Fokus! */
+a:focus,
+button:focus {
+    outline: 4px solid #ffd700;
+    background-color: #333333;
+    color: #ffd700;
+}
+
+ul,
+ol {
+    margin-bottom: 30px;
+}
+
+li {
+    margin-bottom: 15px;
+}
+
+details {
+    border: solid;
+    padding: 5px;
+    border-style: groove;
+}
+
+.box {
+    border: 2px solid #ffffe0;
+    padding: 20px;
+    background-color: #1e1e1e;
+    margin-top: 30px;
+}
