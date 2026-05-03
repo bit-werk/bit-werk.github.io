@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="de">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Lektion 1 - Shortcuts</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <main>
+            <h1>Lektion 1: Shortcuts & deine erste Webseite</h1>
+
+            <h2>Was ist eigentlich ein Cheat-Sheet?</h2>
+            <p>
+                Ein "Cheat-Sheet" ist das englische Wort für Spickzettel. In der
+                Informatik merkt sich niemand alle Befehle auswendig! Profis
+                schreiben sich die wichtigsten Tastenkürzel (Shortcuts) auf
+                einen Spickzettel. Das ist wie dein externes Gehirn. Heute baust
+                du dir deinen eigenen Spickzettel – und zwar als echte Webseite!
+            </p>
+
+            <h2>Schritt 1: Vorbereitung der Datei</h2>
+            <p>
+                Wenn du einfach auf den Link unten klickst, öffnet sich eine
+                leere, weisse Seite. Das bringt uns nichts. Wir müssen die Datei
+                erst richtig auf deinem Computer speichern!
+            </p>
+
+            <details>
+                <summary>
+                    <strong
+                        >Klicke hier für die genaue Anleitung zum Speichern
+                        (Ausklappen)</strong
+                    >
+                </summary>
+                <p>
+                    1. Rechtsklick auf dem Link. (Oder finde heraus, wie das nur
+                    mit Tasten geht!) 2. Wähle "Ziel speichern unter..." oder
+                    "Link speichern unter...".<br />
+                    3. <strong>Ganz wichtig:</strong> Speichere die Datei an
+                    einem Ort, den du wiederfindest! Zum Beispiel auf dem
+                    Schreibtisch (Desktop) in einem neuen Ordner namens
+                    "Informatik".
+                </p>
+            </details>
+
+            <div class="box">
+                <p>
+                    <a href="cheat-sheet-vorlage.html"
+                        >Hier ist der Link zur Vorlage
+                        (cheat-sheet-vorlage.html)</a
+                    >
+                </p>
+            </div>
+
+            <h2>Schritt 2: Das Geheimnis der zwei Programme</h2>
+            <p>
+                Um eine Webseite zu bauen, musst du dieselbe Datei nun in
+                <strong>zwei verschiedenen Programmen gleichzeitig</strong>
+                öffnen.
+            </p>
+            <ol>
+                <li>
+                    <strong>Der Browser (z.B. Firefox oder Chrome):</strong>
+                    Hier schaust du dir an, wie die fertige Seite aussieht und
+                    wie der Screenreader sie vorliest.
+                </li>
+                <li>
+                    <strong
+                        >Der Text-Editor (z.B. Notepad oder Windows
+                        Editor):</strong
+                    >
+                    Hier schreibst du den HTML-Code (den Maschinenraum).
+                </li>
+            </ol>
+
+            <details>
+                <summary>
+                    <strong
+                        >Wie öffne ich die Datei im Text-Editor?
+                        (Ausklappen)</strong
+                    >
+                </summary>
+                <p>
+                    Gehe in deinen Ordner, in dem du die Datei gespeichert hast.
+                    Ein normaler Klick öffnet sie im Browser. Um sie im Editor
+                    zu öffnen, muss deine Begleitperson einen Rechtsklick auf
+                    die Datei machen und "Öffnen mit..." wählen. Dort wählt ihr
+                    "Editor" oder "Notepad" aus.
+                </p>
+            </details>
+
+            <h2>Schritt 3: Erste Schritte im HTML-Maschinenraum</h2>
+            <p>
+                Du hast nun den Spickzettel in einem Texteditor geöffnet. Alles
+                was auf der Seite erscheinen soll, muss im &lt;body&gt; stehen.
+                Wir bauen nun die Grundstruktur für deinen Spickzettel. Tippe
+                also zwischen den body-tags das Foldgende haargenau ab. Pass auf
+                die spitzigen Klammern auf! Und wie gesagt, bei Problemen kannst
+                du auch immer im Internet suchen oder ChatGPT fragen.
+            </p>
+
+            <ol>
+                <li>
+                    Erstelle eine Hauptüberschrift. Der Code dafür lautet:
+                    <code>&lt;h1&gt;Mein Cheat-Sheet&lt;/h1&gt;</code>
+                </li>
+                <li>
+                    Erstelle darunter eine kleinere Überschrift für den ersten
+                    Teil: <code>&lt;h2&gt;Browser&lt;/h2&gt;</code>
+                </li>
+                <li>
+                    Erstelle darunter noch eine kleinere Überschrift für den
+                    zweiten Teil: <code>&lt;h2&gt;Screenreader&lt;/h2&gt;</code>
+                </li>
+            </ol>
+
+            <details>
+                <summary>
+                    <strong
+                        >Der wichtigste Ablauf der Welt: Der Speicher-Kreislauf
+                        (Ausklappen)</strong
+                    >
+                </summary>
+                <p>
+                    Wenn ihr im Editor etwas getippt habt, müsst ihr drei Dinge
+                    tun, um das Ergebnis zu sehen:
+                </p>
+                <ul>
+                    <li>
+                        <strong>1. Speichern:</strong> Drücke im Editor
+                        <code>Ctrl + S</code>.
+                    </li>
+                    <li>
+                        <strong>2. Fenster wechseln:</strong> Wechsle mit
+                        <code>Alt + Tab</code> rüber zum Browser.
+                    </li>
+                    <li>
+                        <strong>3. Neuladen:</strong> Drücke im Browser
+                        <code>F5</code>, um die Seite neu zu laden. Jetzt sollte
+                        dein Screenreader die neuen Überschriften finden!
+                    </li>
+                </ul>
+            </details>
+
+            <h2>Schritt 4: Shortcuts für den Browser eintragen</h2>
+            <p>
+                Unter deiner Überschrift "Browser" legen wir nun eine Liste an.
+                Dein Screenreader liebt Listen!
+            </p>
+            <p>
+                Eine Liste startet man in HTML mit
+                <code>&lt;ul&gt;</code> (Unordered List). Jeder einzelne Eintrag
+                bekommt ein <code>&lt;li&gt;</code> (List Item). Am Ende
+                schliesst man die Liste mit <code>&lt;/ul&gt;</code>.
+            </p>
+            <p><strong>Diktiere Folgendes in den Editor:</strong></p>
+            <p>
+                <code>&lt;ul&gt;</code><br />
+                <code>&lt;li&gt;Neuen Tab öffnen: Ctrl + T&lt;/li&gt;</code
+                ><br />
+                <code>&lt;li&gt;Tab schliessen: Ctrl + W&lt;/li&gt;</code><br />
+                <code
+                    >&lt;li&gt;Schrift vergrössern: Ctrl + Plus&lt;/li&gt;</code
+                ><br />
+                <code
+                    >&lt;li&gt;Schrift verkleinern: Ctrl +
+                    Minus&lt;/li&gt;</code
+                ><br />
+                <code>&lt;li&gt;Originalgrösse: Ctrl + 0 (Null)&lt;/li&gt;</code
+                ><br />
+                <code
+                    >&lt;li&gt;Zwischen Tabs wechseln: Ctrl +
+                    Tab&lt;/li&gt;</code
+                ><br />
+                <code
+                    >&lt;li&gt;Lesezeichen (Bookmark) setzen: Ctrl +
+                    D&lt;/li&gt;</code
+                ><br />
+                <code>&lt;/ul&gt;</code>
+            </p>
+
+            <p>
+                Nutze den Speicher-Kreislauf (Speichern, rüberwechseln, F5
+                drücken). Funktioniert die Liste? Teste gleich mal die Befehle
+                für die Schriftgrösse in deinem Browser aus!
+            </p>
+
+            <h2>Schritt 5: Shortcuts für den Screenreader</h2>
+            <p>
+                Der Browser steuert die Fenster. Dein Screenreader steuert, wie
+                du Inhalte auf der Webseite findest.
+            </p>
+            <p>
+                Erstelle unter der Überschrift "Screenreader" eine zweite Liste
+                (wieder mit <code>&lt;ul&gt;</code> und
+                <code>&lt;li&gt;</code>). Notiere dort mindestens diese Befehle
+                (frage deine Begleitperson, falls du die Tasten deines
+                speziellen Screenreaders nicht kennst):
+            </p>
+            <ul>
+                <li>
+                    Zur nächsten Überschrift springen (meistens die Taste H)
+                </li>
+                <li>Zur nächsten Liste springen (meistens die Taste L)</li>
+                <li>
+                    Die Elementliste / Linkliste aufrufen (meistens Einfg + F7)
+                </li>
+            </ul>
+
+            <h2>Schritt 6: Experten-Recherche (Die letzte Aufgabe)</h2>
+            <p>
+                Dein Spickzettel ist schon ziemlich gut. Aber Profis stehlen
+                gerne gute Ideen!
+            </p>
+            <p>
+                Gehe auf Google (oder öffne eine KI wie ChatGPT) und suche nach
+                Begriffen wie:
+                <em>"Die wichtigsten Shortcuts Screenreader Sehbehinderung"</em
+                >. <br />
+                Finde 2 bis 3 weitere nützliche Tastenkürzel, die dir noch
+                fehlen. Ergänze sie als neue Einträge (<code>&lt;li&gt;</code>)
+                in deiner HTML-Datei.
+            </p>
+
+            <h2>Abschluss</h2>
+            <p>
+                Wenn du alles gespeichert hast, bist du für heute fertig.
+                Glückwunsch, du hast eine echte Webseite programmiert und kennst
+                nun deinen Werkzeugkasten!
+            </p>
+            <p><a href="index.html">Zurück zur Startseite</a></p>
+        </main>
+    </body>
+</html>
