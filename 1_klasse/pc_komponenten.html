@@ -168,20 +168,13 @@
             }
 
             .info-img {
-                width: 100%;
+                display: block;
+                width: auto;
+                max-width: 100%;
                 height: auto;
-                min-height: 100px;
-                background: #2a2530;
                 border-radius: 6px;
-                margin: 5px 0 10px 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #888;
-                font-style: italic;
-                font-size: 12px;
+                margin: 5px auto 10px;
                 border: 1px dashed rgba(255, 255, 255, 0.2);
-                object-fit: cover;
             }
 
             .fig-cap {
@@ -207,7 +200,7 @@
             }
 
             .acc-item.active .acc-body {
-                max-height: 45vh;
+                max-height: 1500px;
             }
 
             #tooltip {
@@ -258,9 +251,12 @@
             }
 
             #lightbox-img {
-                width: 100%;
+                display: block;
+                width: auto;
+                max-width: 100%;
                 height: auto;
                 max-height: 65vh;
+                align-self: center;
                 object-fit: contain;
                 border-radius: 6px;
             }
@@ -372,7 +368,7 @@
                 }
 
                 .acc-item.active .acc-body {
-                    max-height: 40vh;
+                    max-height: 1500px;
                 }
             }
         </style>
@@ -448,13 +444,13 @@
                 },
                 mb: {
                     title: "2. Motherboard",
-                    desc: "<p><strong>Weitere Bezeichnungen</strong><br> <em>Mainboard</em>, Hauptplatine.</p><p><strong>Aufgabe</strong><br> Zentrale Leiterplatte des Computers. Verbindet alle Komponenten elektrisch, verteilt Strom und ermöglicht Datenaustausch zwischen Prozessor, Speicher und weiteren Geräten.</p><p><strong>Verbindung</strong><br> CPU sitzt im Sockel, RAM in Steckplätzen, Grafikkarte meist im PCIe-Slot. Laufwerke, Lüfter, Front-Panel und Netzteil werden per Kabel angeschlossen.</p><p><strong>Wissenswertes</strong><br> Ursprünglich gab es zusätzliche Karten z.B. für Netzwerk oder Sound. Heute sind diese Funktionalitäten meist schon integriert.</p>",
+                    desc: "<p><strong>Weitere Bezeichnungen</strong><br> <em>Mainboard</em>, Hauptplatine.</p><p><strong>Aufgabe</strong><br> Zentrale Leiterplatte des Computers. Das Motherboard verbindet alle wichtigen Komponenten eines Computers miteinander. Es sorgt dafür, dass CPU, Arbeitsspeicher, Grafikkarte und andere Geräte miteinander kommunizieren und mit Strom versorgt werden. Ausserdem koordiniert es den Start des Computers und ermöglicht den Anschluss zusätzlicher Hardware.</p><p><strong>Verbindung</strong><br> CPU sitzt im Sockel, RAM in Steckplätzen, Grafikkarte meist im PCIe-Slot. Laufwerke, Lüfter, Front-Panel und Netzteil werden per Kabel angeschlossen.</p><p><strong>Wissenswertes</strong><br> Ursprünglich gab es zusätzliche Karten z.B. für Netzwerk oder Sound. Heute sind diese Funktionalitäten meist schon integriert.</p>",
                     source: '<a href="https://pixabay.com/photos/motherboard-computer-plate-3406930/" target="_blank">kameng, <em>Motherboard</em></a> - <a href="https://pixabay.com/service/license-summary/" target="_blank">Pixabay Content License</a>',
                     img: "./images/motherboard.jpg",
                 },
                 cpu: {
                     title: "3. Prozessor (CPU)",
-                    desc: "<p><strong>Weitere Bezeichnungen</strong><br> CPU (<em>Central Processing Unit</em>), Prozessor.</p><p><strong>Aufgabe</strong><br> Führt Befehle von Programmen aus, verarbeitet Daten und steuert zentrale Abläufe des Systems. Sie gilt als „Gehirn“ des Computers.</p><p><strong>Verbindung</strong><br> Sitzt im CPU-Sockel des Motherboards. Tauscht Daten mit RAM aus und wird direkt vom Netzteil mit Strom versorgt. Benötigt meist einen Kühler.</p><p><strong>Wissenswertes</strong><br> Alte Prozessoren bestanden aus einem Kern (eine einzelne Recheneinheit). Moderne CPUs besitzen mehrere Rechenkerne für paralleles Arbeiten. Diese arbeiten mit einem Takt von ca. 2.5-4.5 GHz - das sind 2.5-4.5 Taktzyklen pro Sekunde. In jedem Takt kann die CPU je nach Aufgabe unterschiedlich viel Arbeit erledigen.</p>",
+                    desc: "<p><strong>Weitere Bezeichnungen</strong><br> CPU (<em>Central Processing Unit</em>), Prozessor.</p><p><strong>Aufgabe</strong><br> Führt Befehle von Programmen aus, verarbeitet Daten und steuert zentrale Abläufe des Systems. Sie gilt als „Gehirn“ des Computers.</p><p><strong>Verbindung</strong><br> Sitzt im CPU-Sockel des Motherboards. Tauscht Daten mit RAM aus und wird direkt vom Netzteil mit Strom versorgt. Benötigt meist einen Kühler.</p><p><strong>Wissenswertes</strong><br> Alte Prozessoren bestanden aus einem Kern (eine einzelne Recheneinheit). Moderne CPUs besitzen mehrere Rechenkerne für paralleles Arbeiten. Diese arbeiten mit einem Takt von ca. 2.5-4.5 GHz - das sind 2.5-4.5 Milliarden Taktzyklen pro Sekunde. In jedem Takt kann die CPU je nach Aufgabe unterschiedlich viel Arbeit erledigen.</p>",
                     source: '<a href="https://commons.wikimedia.org/wiki/File:Athlon_64_X2_E6_3800.jpg" target="_blank">Echoray, <em>Athlon 64 X2 3800+</em></a> - <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">CC BY-SA 3.0</a>',
                     img: "./images/cpu.jpg",
                 },
