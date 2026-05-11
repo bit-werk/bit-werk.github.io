@@ -1,8 +1,8 @@
-# Lektion 3: Barrieren & KI
+# Lektion 4: Das Bewertungssystem
 
-**Ziele:** Verstehen, warum Bilder ohne `alt`-Text und schlechte Linktexte Barrieren sind. Eine KI (z.B. ChatGPT/Copilot) als Hilfsmittel nutzen.
+**Ziele:** Die Schülerin abstrahiert ihr Wissen und baut sich eine Checkliste für die Zukunft.
 
 **Rolle Begleitperson:**
-1. Die Schülerin wird die Datei `barriere.html` untersuchen und sich vermutlich ärgern.
-2. Wenn sie bereit für die KI ist, öffnen Sie ein verfügbares KI-Tool im Browser (z.B. ChatGPT).
-3. Kopieren Sie den Link des Katzenbildes in die KI. Die Schülerin diktiert den Prompt (z.B. "Beschreibe mir dieses Bild"). Die Schülerin lässt sich die Antwort der KI vom Screenreader vorlesen.
+1. Die Schülerin soll ein Markdown-Dokument (`.md`) aufbauen.
+2. Helfen Sie ihr bei der Markdown-Syntax: `#` für Überschriften, `*` oder `-` für Listenpunkte.
+3. Die inhaltlichen Kriterien muss sie sich komplett selbst ausdenken (z.B. "Gibt es gute Linktexte?", "Funktioniert die H-Taste?").
