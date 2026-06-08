@@ -1,4 +1,4 @@
-# Lektion 4: Das Bewertungssystem
+# Lektion 3: Das Bewertungssystem
 
 **Ziele:** Die Schülerin abstrahiert ihr Wissen und baut sich eine Checkliste für die Zukunft.
 
