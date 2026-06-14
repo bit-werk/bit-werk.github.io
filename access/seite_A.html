@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schülerclub Robotik – Anmeldung und Infos</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #1a1a1a; }
+    header { border-bottom: 3px solid #2a5d8f; margin-bottom: 1.5rem; }
+    h1 { color: #2a5d8f; }
+    h2 { color: #2a5d8f; margin-top: 2rem; }
+    nav ul { list-style: none; padding: 0; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { color: #2a5d8f; text-decoration: underline; }
+    a:focus, button:focus { outline: 3px solid #e08a00; outline-offset: 2px; }
+    img { max-width: 100%; height: auto; border-radius: 6px; }
+    label { display: block; margin-top: 1rem; font-weight: bold; }
+    input, textarea { width: 100%; padding: 0.5rem; margin-top: 0.25rem; font-size: 1rem; box-sizing: border-box; }
+    button { margin-top: 1.5rem; background: #2a5d8f; color: #fff; border: none; padding: 0.75rem 1.5rem; font-size: 1rem; border-radius: 4px; cursor: pointer; }
+    footer { margin-top: 3rem; border-top: 1px solid #ccc; padding-top: 1rem; color: #555; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Schülerclub Robotik</h1>
+    <nav aria-label="Hauptnavigation">
+      <ul>
+        <li><a href="#angebot">Unser Angebot</a></li>
+        <li><a href="#team">Das Team</a></li>
+        <li><a href="#anmeldung">Anmeldung</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section id="angebot">
+      <h2>Unser Angebot</h2>
+      <p>Im Schülerclub Robotik baust du jede Woche kleine Roboter, programmierst sie und nimmst an Wettbewerben teil. Wir treffen uns jeden Mittwoch von 16 bis 18 Uhr im Technikraum.</p>
+      <p>Du brauchst keine Vorkenntnisse. Wir starten gemeinsam bei den Grundlagen und arbeiten uns Schritt für Schritt zu eigenen Projekten vor.</p>
+      <img src="https://placehold.co/640x300" alt="Drei Schülerinnen und Schüler sitzen an einem Tisch und bauen gemeinsam einen kleinen fahrbaren Roboter aus bunten Bausteinen.">
+    </section>
+
+    <section id="team">
+      <h2>Das Team</h2>
+      <ul>
+        <li>Frau Berger – Leitung, Fachbereich Informatik</li>
+        <li>Herr Demir – Elektronik und Löttechnik</li>
+        <li>Zwei Schüler-Mentor:innen aus dem 6. Jahrgang</li>
+      </ul>
+    </section>
+
+    <section id="anmeldung">
+      <h2>Anmeldung</h2>
+      <p>Fülle das Formular aus, um dich für das nächste Semester anzumelden. Wir melden uns innerhalb einer Woche bei dir.</p>
+      <form action="#" method="post">
+        <label for="name">Vor- und Nachname</label>
+        <input type="text" id="name" name="name" autocomplete="name">
+
+        <label for="klasse">Klasse</label>
+        <input type="text" id="klasse" name="klasse">
+
+        <label for="email">E-Mail-Adresse</label>
+        <input type="email" id="email" name="email" autocomplete="email">
+
+        <label for="nachricht">Warum möchtest du mitmachen? (optional)</label>
+        <textarea id="nachricht" name="nachricht" rows="4"></textarea>
+
+        <button type="submit">Anmeldung absenden</button>
+      </form>
+    </section>
+
+    <section id="kontakt">
+      <h2>Kontakt</h2>
+      <p>Hast du Fragen? Schreib uns eine E-Mail an
+        <a href="mailto:robotik@beispielschule.ch">robotik@beispielschule.ch</a>
+        oder ruf im Sekretariat unter 044 123 45 67 an.</p>
+      <p>Mehr Infos findest du auf der
+        <a href="https://www.beispielschule.ch">Webseite der Schule</a>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Schülerclub Robotik – Beispielschule Musterstadt. Diese Seite dient nur zu Übungszwecken.</p>
+  </footer>
+</body>
+</html>
