@@ -6,6 +6,7 @@ import Quiz from '../components/Quiz.jsx'
 import { Module, Unit, Observation, Split, Stat, Formal } from '../components/ui.jsx'
 import { Tex } from '../components/Tex.jsx'
 import { fmt } from '../lib/math.js'
+import { C, par, knum, kc, kcol, krow } from '../lib/texfmt.js'
 
 const sc = (v, k) => ({ x: v.x * k, y: v.y * k })
 const add = (u, v) => ({ x: u.x + v.x, y: u.y + v.y })
@@ -58,7 +59,7 @@ function NotationLab() {
         vector inline as a tuple <Tex>{String.raw`(x, y)`}</Tex>. The form we'll actually use once
         matrices arrive is a <b>column</b> — and its sideways twin is a <b>row</b>:
       </p>
-      <Tex block>{String.raw`v = \begin{pmatrix} ${fmt(v.x)} \\ ${fmt(v.y)} \end{pmatrix} \;\equiv\; (${fmt(v.x)},\, ${fmt(v.y)}), \qquad v^{\top} = \begin{pmatrix} ${fmt(v.x)} & ${fmt(v.y)} \end{pmatrix}`}</Tex>
+      <Tex block>{String.raw`v = ${kcol(C.green, v.x, v.y)} \;\equiv\; (${fmt(v.x)},\, ${fmt(v.y)}), \qquad v^{\top} = ${krow(C.green, v.x, v.y)}`}</Tex>
       <p>
         The bracketed column and the inline tuple are the <b>same vector</b> — the tuple is just written
         sideways to save space. Turning a column on its side <i>for real</i> is <b>transposition</b>,{' '}
@@ -120,8 +121,8 @@ function AddLab() {
         <b style={{ color: '#1769ff' }}>u</b>'s tip. Where you end up is <b style={{ color: '#12b886' }}>u + w</b>.
         Numerically you just add coordinates.
       </p>
-      <div className="formula" style={{ textAlign: 'left' }}>
-        u + w = ({fmt(u.x)}, {fmt(u.y)}) + ({fmt(w.x)}, {fmt(w.y)}) = ({fmt(s.x)}, {fmt(s.y)})
+      <div className="formula">
+        <Tex block>{String.raw`\begin{aligned} u + w &= ${kcol(C.blue, u.x, u.y)} + ${kcol(C.orange, w.x, w.y)} \\[4pt] &= \begin{pmatrix} ${par(u.x)} + ${par(w.x)} \\[2pt] ${par(u.y)} + ${par(w.y)} \end{pmatrix} = ${kcol(C.green, s.x, s.y)} \end{aligned}`}</Tex>
       </div>
       <Observation>
         The two dashed copies close up a <b>parallelogram</b>: u + w = w + u, so it doesn't matter which
@@ -162,39 +163,55 @@ function ScaleLab() {
   )
 }
 
-/* 0.4 — linear combinations */
+/* 0.5 — linear combinations */
+const BLUE = '#1769ff'
+const ORANGE = '#e8590c'
+const GREEN = '#12b886'
+
 function ComboLab() {
-  const u = { x: 1.5, y: 0.5 }
-  const w = { x: -0.5, y: 1.4 }
+  const [u, setU] = useState({ x: 1.5, y: 0.5 })
+  const [w, setW] = useState({ x: -0.5, y: 1.5 })
   const [a, setA] = useState(1)
   const [b, setB] = useState(1)
   const au = sc(u, a)
   const target = add(au, sc(w, b))
+
+  const formula = String.raw`\begin{aligned}
+a\,u + b\,w
+  &= ${knum(BLUE, a)}\,${kcol(BLUE, u.x, u.y)} \;+\; ${knum(ORANGE, b)}\,${kcol(ORANGE, w.x, w.y)} \\[4pt]
+  &= \begin{pmatrix} ${par(a)}\cdot ${par(u.x)} + ${par(b)}\cdot ${par(w.x)} \\[2pt] ${par(a)}\cdot ${par(u.y)} + ${par(b)}\cdot ${par(w.y)} \end{pmatrix} \\[4pt]
+  &= ${kcol(GREEN, target.x, target.y)}
+\end{aligned}`
+
   return (
     <Split
       visual={
         <Plane size={S} range={5}>
-          <Vector to={u} color="#1769ff" width={2} label="u" />
-          <Vector to={w} color="#e8590c" width={2} label="w" />
-          <Vector to={au} color="#1769ff" width={3} dashed />
-          <Vector from={au} to={target} color="#e8590c" width={3} dashed />
-          <Vector to={target} color="#12b886" width={3.5} label="a·u + b·w" />
-          <Dot at={target} color="#12b886" />
+          <Vector to={au} color={BLUE} width={3} dashed />
+          <Vector from={au} to={target} color={ORANGE} width={3} dashed />
+          <Vector to={target} color={GREEN} width={3.5} label="a·u + b·w" />
+          <Dot at={target} color={GREEN} />
+          <DraggableVector value={u} onChange={setU} color={BLUE} label="u" snap={0.5} />
+          <DraggableVector value={w} onChange={setW} color={ORANGE} label="w" snap={0.5} />
         </Plane>
       }
     >
       <p>
-        Combine the two moves: scale u by <b>a</b>, scale w by <b>b</b>, and add. The result{' '}
-        <b>a·u + b·w</b> is called a <b>linear combination</b> — the single most important phrase in the
-        whole subject.
+        Combine the two moves: scale <b style={{ color: BLUE }}>u</b> by{' '}
+        <b style={{ color: BLUE }}>a</b>, scale <b style={{ color: ORANGE }}>w</b> by{' '}
+        <b style={{ color: ORANGE }}>b</b>, and add. The result <b style={{ color: GREEN }}>a·u + b·w</b>{' '}
+        is a <b>linear combination</b> — the single most important phrase in the whole subject.{' '}
+        <b>Drag u or w</b>, or turn the dials, and every number below updates.
       </p>
-      <Slider label="a =" value={a} onChange={setA} min={-3} max={3} step={0.1} color="#1769ff" />
-      <Slider label="b =" value={b} onChange={setB} min={-3} max={3} step={0.1} color="#e8590c" />
-      <Stat label="result" value={`(${fmt(target.x)}, ${fmt(target.y)})`} color="#12b886" />
+      <Slider label="a =" value={a} onChange={setA} min={-3} max={3} step={0.1} color={BLUE} />
+      <Slider label="b =" value={b} onChange={setB} min={-3} max={3} step={0.1} color={ORANGE} />
+      <div className="formula">
+        <Tex block>{formula}</Tex>
+      </div>
       <Observation>
-        By turning the two dials you can steer the green tip <b>anywhere in the plane</b>. That reach —
-        every point you can hit with some a and b — is what the next chapter calls the <b>span</b> of u
-        and w.
+        By dragging the vectors or turning the two dials you can steer the green tip{' '}
+        <b>anywhere in the plane</b>. That reach — every point you can hit with some a and b — is what the
+        next chapter calls the <b>span</b> of u and w.
       </Observation>
       <Check
         prompt="With these two (non-parallel) vectors, which points can a·u + b·w reach?"
@@ -229,7 +246,7 @@ function BasisComboLab() {
         <b style={{ color: '#e8590c' }}>ĵ = (0,1)</b>:
       </p>
       <div className="formula">
-        v = {fmt(v.x)}·î + {fmt(v.y)}·ĵ
+        <Tex block>{String.raw`v = ${fmt(v.x)}\,${kc(C.blue, String.raw`\hat{\imath}`)} + ${fmt(v.y)}\,${kc(C.orange, String.raw`\hat{\jmath}`)} = ${fmt(v.x)}${kcol(C.blue, 1, 0)} + ${fmt(v.y)}${kcol(C.orange, 0, 1)} = ${kcol(C.green, v.x, v.y)}`}</Tex>
       </div>
       <Observation>
         "Reading off coordinates" and "writing v as a combination of î and ĵ" are the same act. When a

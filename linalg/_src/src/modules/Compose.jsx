@@ -4,7 +4,7 @@ import MatrixInput from '../components/MatrixInput.jsx'
 import Quiz from '../components/Quiz.jsx'
 import Check from '../components/Check.jsx'
 import { Tex } from '../components/Tex.jsx'
-import { Module, Unit, Observation, Split, Formal, Btn, PresetRow, MatrixView, Expert } from '../components/ui.jsx'
+import { Module, Unit, Observation, Split, Formal, Btn, PresetRow, Expert } from '../components/ui.jsx'
 import { apply, multiply, rotation, fmt, IDENTITY } from '../lib/math.js'
 
 const COL = { i: '#1769ff', j: '#e8590c', A: '#7048e8', B: '#0ca678', C: '#1c7ed6' }
@@ -76,11 +76,11 @@ function ComposeLab({ A, B, setA, setB }) {
       <div className="stat-row" style={{ marginTop: 4 }}>
         <div>
           <div className="stat-label">AB</div>
-          <MatrixView M={AB} />
+          <Tex>{matTex(AB)}</Tex>
         </div>
         <div>
           <div className="stat-label">BA</div>
-          <MatrixView M={BA} />
+          <Tex>{matTex(BA)}</Tex>
         </div>
       </div>
       <Observation>

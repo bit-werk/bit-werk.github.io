@@ -2,8 +2,10 @@ import { useState } from 'react'
 import Plane, { Vector } from '../components/Plane.jsx'
 import MatrixInput from '../components/MatrixInput.jsx'
 import Quiz from '../components/Quiz.jsx'
-import { Card, Panel, Btn, MatrixView, Experiment } from '../components/ui.jsx'
+import { Card, Panel, Btn, Experiment } from '../components/ui.jsx'
+import { Tex } from '../components/Tex.jsx'
 import { apply, multiply, lu, qr, fmt, det, IDENTITY } from '../lib/math.js'
+import { kmat } from '../lib/texfmt.js'
 
 export default function Decompositions() {
   const [M, setM] = useState({ a: 2, b: 1, c: 1, d: 2 })
@@ -78,9 +80,7 @@ export default function Decompositions() {
 
           <Panel title="The factors">
             <div className="factor-eq">
-              <MatrixView M={M} /> <span>=</span>{' '}
-              <MatrixView M={outer} color="#1769ff" /> <span>·</span>{' '}
-              <MatrixView M={inner} color="#e8590c" />
+              <Tex block>{String.raw`${kmat(M)} = ${kmat(outer, '#1769ff')} \cdot ${kmat(inner, '#e8590c')}`}</Tex>
             </div>
             <div className="factor-legend">
               <span style={{ color: '#1769ff' }}>

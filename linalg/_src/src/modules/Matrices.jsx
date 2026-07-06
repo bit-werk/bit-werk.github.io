@@ -4,7 +4,7 @@ import MatrixInput from '../components/MatrixInput.jsx'
 import Quiz from '../components/Quiz.jsx'
 import Check from '../components/Check.jsx'
 import { Tex } from '../components/Tex.jsx'
-import { Module, Unit, Observation, Split, Formal, Btn, PresetRow, Stat, MatrixView, Expert } from '../components/ui.jsx'
+import { Module, Unit, Observation, Split, Formal, Btn, PresetRow, Stat, Expert } from '../components/ui.jsx'
 import { useAnimatedT } from '../hooks/useAnimatedT.js'
 import {
   apply,
@@ -15,7 +15,6 @@ import {
   rotation,
   scaling,
   fmt,
-  IDENTITY,
 } from '../lib/math.js'
 
 const sc = (v, k) => ({ x: v.x * k, y: v.y * k })
@@ -30,12 +29,12 @@ const cg = (s) => String.raw`\textcolor{${COL.v}}{${s}}`
 const colvecTex = (x, y) => String.raw`\begin{bmatrix} ${fmt(x)} \\ ${fmt(y)} \end{bmatrix}`
 
 // A small editable 2×1 column vector, to sit beside a matrix as "M v".
-function ColVec({ value, onChange, step = 0.5, color }) {
+function ColVec({ value, onChange, step = 0.5, color, caption }) {
   const set = (k) => (e) => {
     const n = parseFloat(e.target.value)
     onChange?.({ ...value, [k]: Number.isFinite(n) ? n : 0 })
   }
-  return (
+  const box = (
     <div className="colvec">
       <div className="bracket left" />
       <div className="colvec-grid">
@@ -45,11 +44,70 @@ function ColVec({ value, onChange, step = 0.5, color }) {
       <div className="bracket right" />
     </div>
   )
+  // A caption below matches the matrix's "where î/ĵ lands" labels, so the two
+  // stacks line up in height and the numbers sit at the same level.
+  if (!caption) return box
+  return (
+    <div className="colvec-labeled">
+      {box}
+      <div className="colvec-caption">{caption}</div>
+    </div>
+  )
 }
+
+// A small decorative grid deformed by an arbitrary point map `f` (linear or
+// not). Straight lines are sampled into short segments so non-linear warps
+// render as curves. Used for the little "visual aid" figures (3.0, 3.2).
+function MiniGrid({ f, size = 150, range = 2, label, stroke = '#c4cbe0', square = '#7c5cff' }) {
+  const scale = size / (2 * range)
+  const cx = size / 2
+  const cy = size / 2
+  const N = 16
+  const P = (p) => {
+    const q = f(p)
+    return `${(cx + q.x * scale).toFixed(1)},${(cy - q.y * scale).toFixed(1)}`
+  }
+  const sample = (a, b) => {
+    const pts = []
+    for (let i = 0; i <= N; i++) {
+      const t = i / N
+      pts.push(P({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }))
+    }
+    return pts.join(' ')
+  }
+  const lines = []
+  for (let i = -range; i <= range; i++) {
+    const axis = i === 0
+    lines.push(
+      <polyline key={`v${i}`} points={sample({ x: i, y: -range }, { x: i, y: range })} fill="none" stroke={axis ? '#9aa3b2' : stroke} strokeWidth={axis ? 1.4 : 1} />,
+      <polyline key={`h${i}`} points={sample({ x: -range, y: i }, { x: range, y: i })} fill="none" stroke={axis ? '#9aa3b2' : stroke} strokeWidth={axis ? 1.4 : 1} />,
+    )
+  }
+  const corners = [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 1 }]
+  const sq = []
+  for (let e = 0; e < 4; e++) {
+    const a = corners[e]
+    const b = corners[(e + 1) % 4]
+    for (let i = 0; i < N; i++) {
+      const t = i / N
+      sq.push(P({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }))
+    }
+  }
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ borderRadius: 10, border: '1px solid var(--line)', background: '#fbfcfe' }}>
+      {lines}
+      <polygon points={sq.join(' ')} fill={square} fillOpacity="0.16" stroke={square} strokeWidth="1.6" />
+      {label && <text x={9} y={20} fontSize="14" fontWeight="700" fill="#495057">{label}</text>}
+    </svg>
+  )
+}
+
+const idMap = (p) => p
+const linMap = (M) => (p) => apply(M, p)
 
 /* ── 3.1 · recall: the recipe ───────────────────────────────────────────── */
 function DecomposeLab() {
-  const [v, setV] = useState({ x: 2, y: 1 })
+  const [v, setV] = useState({ x: 3, y: 2 })
   const i = { x: 1, y: 0 }
   const j = { x: 0, y: 1 }
   return (
@@ -73,6 +131,8 @@ function DecomposeLab() {
         each you combine:
       </p>
       <Tex block>{String.raw`v = v_1\,${ci('\\hat\\imath')} + v_2\,${cj('\\hat\\jmath')} \;=\; ${fmt(v.x)}\,${ci('\\hat\\imath')} + ${fmt(v.y)}\,${cj('\\hat\\jmath')}`}</Tex>
+      <p>Writing î and ĵ as columns, that recipe is literally the coordinates:</p>
+      <Tex block>{String.raw`${fmt(v.x)}\,${ci(colvecTex(1, 0))} + ${fmt(v.y)}\,${cj(colvecTex(0, 1))} = ${cg(colvecTex(v.x, v.y))}`}</Tex>
       <Observation>
         Read every vector as "<b>so much î plus so much ĵ</b>". Once we move î and ĵ, this recipe is what
         carries every other vector along — that single sentence is the engine of the whole chapter.
@@ -126,8 +186,11 @@ function BasisDragLab() {
       <p>Stacking the two landing spots as <b>columns</b> gives the matrix M, and applying it is just this recipe:</p>
       <div className="mat-times-vec">
         <MatrixInput value={M} onChange={setFromM} />
-        <span className="op">·</span>
-        <ColVec value={v} onChange={setV} color="#495057" />
+        <div className="colvec-labeled">
+          <span className="op">·</span>
+          <div className="colvec-caption">&nbsp;</div>
+        </div>
+        <ColVec value={v} onChange={setV} color="#495057" caption="↑ the vector v" />
       </div>
       <Tex block>{String.raw`T(v) = ${fmt(v.x)}\,${ci(colvecTex(iL.x, iL.y))} + ${fmt(v.y)}\,${cj(colvecTex(jL.x, jL.y))} = ${cg(colvecTex(Tv.x, Tv.y))}`}</Tex>
       <Observation>
@@ -167,9 +230,6 @@ function ColumnsLab() {
         <b style={{ color: COL.j }}>ĵ</b> is the <b>second column</b>:
       </p>
       <Tex block>{String.raw`M = \begin{bmatrix} ${ci(fmt(iL.x))} & ${cj(fmt(jL.x))} \\ ${ci(fmt(iL.y))} & ${cj(fmt(jL.y))} \end{bmatrix}`}</Tex>
-      <div style={{ margin: '10px 0' }}>
-        <MatrixInput value={M} readOnly />
-      </div>
       <Formal title="What 'a matrix represents a linear map' means">
         Fixing the basis <Tex>{String.raw`\hat\imath, \hat\jmath`}</Tex>, the matrix whose columns are{' '}
         <Tex>{String.raw`T(\hat\imath)`}</Tex> and <Tex>{String.raw`T(\hat\jmath)`}</Tex> records the map{' '}
@@ -245,40 +305,42 @@ function EntryMeaningLab() {
 
 /* ── 3.6 · multiply M by a vector ───────────────────────────────────────── */
 function MultiplyByHandLab() {
-  const M = { a: 2, b: 0, c: 1, d: 2 }
+  const [col1, setCol1] = useState({ x: 2, y: 0 })
+  const [col2, setCol2] = useState({ x: 1, y: 2 })
   const [v, setV] = useState({ x: 1, y: 1 })
-  const col1 = { x: M.a, y: M.b }
-  const col2 = { x: M.c, y: M.d }
+  const M = { a: col1.x, b: col1.y, c: col2.x, d: col2.y }
   const Mv = add(sc(col1, v.x), sc(col2, v.y))
   return (
     <Split
       visual={
         <Plane size={S} range={6} grid={M} showGhost>
-          <Vector to={col1} color={COL.i} width={2.5} label="col 1" />
-          <Vector to={col2} color={COL.j} width={2.5} label="col 2" />
           <Vector to={sc(col1, v.x)} color={COL.i} width={3} dashed />
           <Vector from={sc(col1, v.x)} to={Mv} color={COL.j} width={3} dashed />
           <Vector to={Mv} color={COL.v} width={3} label="Mv" />
           <Dot at={Mv} color={COL.v} />
+          <DraggableVector value={col1} onChange={setCol1} color={COL.i} label="col 1" snap={0.5} />
+          <DraggableVector value={col2} onChange={setCol2} color={COL.j} label="col 2" snap={0.5} />
           <DraggableVector value={v} onChange={setV} color="#9aa3b2" label="v" snap={1} />
         </Plane>
       }
     >
       <p>
-        Multiplying M by v is the same recipe — but using M's <b>columns</b> in place of î and ĵ. With{' '}
+        Multiplying M by v is the same recipe — but using M's <b>columns</b> in place of î and ĵ.{' '}
+        <b>Drag the two columns</b> (or v) and every number below follows. With{' '}
         <Tex>{`v = ${colvecTex(v.x, v.y)}`}</Tex> and columns{' '}
-        <b style={{ color: COL.i }}>(2, 0)</b>, <b style={{ color: COL.j }}>(1, 2)</b>:
+        <b style={{ color: COL.i }}>({fmt(col1.x)}, {fmt(col1.y)})</b>,{' '}
+        <b style={{ color: COL.j }}>({fmt(col2.x)}, {fmt(col2.y)})</b>:
       </p>
-      <Tex block>{String.raw`M v = ${fmt(v.x)}\,${ci('\\begin{bmatrix} 2 \\\\ 0 \\end{bmatrix}')} + ${fmt(v.y)}\,${cj('\\begin{bmatrix} 1 \\\\ 2 \\end{bmatrix}')} = ${cg(colvecTex(Mv.x, Mv.y))}`}</Tex>
+      <Tex block>{String.raw`M v = ${fmt(v.x)}\,${ci(colvecTex(col1.x, col1.y))} + ${fmt(v.y)}\,${cj(colvecTex(col2.x, col2.y))} = ${cg(colvecTex(Mv.x, Mv.y))}`}</Tex>
       <Formal title="The general rule">
         <Tex block>{String.raw`M v = \begin{bmatrix} ${ci('a')} & ${cj('c')} \\ ${ci('b')} & ${cj('d')} \end{bmatrix}\begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = v_1\,${ci('\\begin{bmatrix} a \\\\ b \\end{bmatrix}')} + v_2\,${cj('\\begin{bmatrix} c \\\\ d \\end{bmatrix}')} = \begin{bmatrix} ${ci('a')}v_1 + ${cj('c')}v_2 \\ ${ci('b')}v_1 + ${cj('d')}v_2 \end{bmatrix}`}</Tex>
         A matrix times a vector is a <b>weighted sum of the columns</b>, with the weights taken from v.
       </Formal>
       <Check
         prompt="Reading columns as landing spots, what is M(2, 0) — i.e. v₁ = 2, v₂ = 0?"
-        options={['col 1 + col 2', '2 · col 1 = (4, 0)', '(2, 0) unchanged']}
+        options={['col 1 + col 2', '2 · col 1', '(2, 0) unchanged']}
         answer={1}
-        explain="M(2,0) = 2·col1 + 0·col2 = 2·(2,0) = (4,0). With v₂ = 0, only the first column contributes."
+        explain="M(2,0) = 2·col1 + 0·col2 = 2·col1. With v₂ = 0, only the first column contributes."
       />
     </Split>
   )
@@ -294,10 +356,19 @@ const APPLY_PRESETS = [
 ]
 function ApplyToSpaceLab() {
   const [M, setM] = useState(rotation(180))
+  const [preset, setPreset] = useState('Rotate 180°')
   const [natural, setNatural] = useState(true)
   const anim = useAnimatedT(1100)
   const current = natural ? naturalPath(M, anim.t) : lerpMat(M, anim.t)
   const reflect = isReflection(M)
+  // Picking a preset selects its chip and plays the transform right away
+  // (identity → M), exactly as if the user had pressed Apply.
+  const pickPreset = (val, label) => {
+    setM(val)
+    setPreset(label)
+    anim.setRaw(0)
+    anim.play()
+  }
   return (
     <Split
       visual={
@@ -329,15 +400,13 @@ function ApplyToSpaceLab() {
         onChange={(e) => anim.setRaw(parseFloat(e.target.value))}
         className="scrub"
       />
-      <div className="stat-row" style={{ marginTop: 8 }}>
-        <div>
-          <div className="stat-label">matrix right now (t = {fmt(anim.raw, 2)})</div>
-          <MatrixView M={current} />
-        </div>
+      <div style={{ marginTop: 8 }}>
+        <div className="stat-label">matrix right now (t = {fmt(anim.raw, 2)})</div>
+        <Tex block>{String.raw`\begin{bmatrix} ${ci(fmt(current.a))} & ${cj(fmt(current.c))} \\ ${ci(fmt(current.b))} & ${cj(fmt(current.d))} \end{bmatrix}`}</Tex>
       </div>
-      <PresetRow presets={APPLY_PRESETS} onPick={(val) => { setM(val); anim.reset() }} />
+      <PresetRow presets={APPLY_PRESETS} onPick={pickPreset} active={preset} />
       <div style={{ marginTop: 10 }}>
-        <MatrixInput value={M} onChange={(m) => { setM(m); anim.reset() }} />
+        <MatrixInput value={M} onChange={(m) => { setM(m); setPreset(null); anim.reset() }} />
       </div>
       <Observation>
         Turn <b>natural motion</b> off and scrub the <b>Rotate 180°</b> preset: the "naïve" path averages
@@ -358,42 +427,6 @@ function ApplyToSpaceLab() {
         answer={1}
         explain="(1,0) = î, and M sends î to its landing spot, which is column 1. Every point rides the same recipe."
       />
-    </Split>
-  )
-}
-
-/* ── 3.8 · field guide ──────────────────────────────────────────────────── */
-const GALLERY = [
-  { label: 'Identity', M: IDENTITY, note: 'Every vector stays put — the "do nothing" map.' },
-  { label: 'Scaling', M: scaling(1.8, 0.6), note: 'Stretch one axis, squash the other. Diagonal entries only.' },
-  { label: 'Rotation', M: rotation(35), note: 'Spin everything about the origin. Squares stay squares.' },
-  { label: 'Shear', M: { a: 1, b: 0, c: 1, d: 1 }, note: 'Slide higher layers sideways. î stays; ĵ leans.' },
-  { label: 'Reflection', M: { a: 1, b: 0, c: 0, d: -1 }, note: 'Flip space over an axis — a mirror world.' },
-]
-function GalleryLab() {
-  const [idx, setIdx] = useState(2)
-  const item = GALLERY[idx]
-  return (
-    <Split
-      visual={
-        <Plane size={S} range={4} grid={item.M} showGhost showUnitSquare unitSquareColor={COL.acc}>
-          <Vector to={apply(item.M, { x: 1, y: 0 })} color={COL.i} width={3.5} label="î" />
-          <Vector to={apply(item.M, { x: 0, y: 1 })} color={COL.j} width={3.5} label="ĵ" />
-        </Plane>
-      }
-    >
-      <p>A quick field guide. Click through the classics and read the columns each time:</p>
-      <div className="btn-row">
-        {GALLERY.map((g, k) => (
-          <Btn key={g.label} active={idx === k} onClick={() => setIdx(k)}>
-            {g.label}
-          </Btn>
-        ))}
-      </div>
-      <div style={{ margin: '8px 0' }}>
-        <MatrixView M={item.M} />
-      </div>
-      <p>{item.note}</p>
       <Check
         prompt="A matrix sends î → (0, 1) and ĵ → (−1, 0). Which map is it?"
         options={['Scaling', 'Rotation 90° counter-clockwise', 'Reflection']}
@@ -404,7 +437,7 @@ function GalleryLab() {
   )
 }
 
-/* ── 3.9 · collapse ─────────────────────────────────────────────────────── */
+/* ── 3.8 · collapse ─────────────────────────────────────────────────────── */
 function CollapseLab() {
   const [c1, setC1] = useState({ x: 1.5, y: 0.5 })
   const [c2, setC2] = useState({ x: 1, y: 1.3 })
@@ -510,6 +543,15 @@ export default function Matrices() {
           The plan: recall that every vector is a recipe of î and ĵ (Chapter 0), pin down what "linear"
           means, then discover that fixing where î and ĵ go fixes the entire map.
         </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, flexWrap: 'wrap', margin: '6px 0 2px' }}>
+          <MiniGrid f={idMap} label="before" />
+          <span style={{ fontSize: 30, color: 'var(--muted)' }}>→</span>
+          <MiniGrid f={linMap({ a: 1.15, b: 0.32, c: 0.55, d: 0.82 })} label="after" />
+        </div>
+        <p className="muted small center">
+          A linear map takes the grid on the left to the one on the right — lines stay straight and evenly
+          spaced, the origin stays put. All of that is captured by two columns of numbers.
+        </p>
       </Unit>
 
       <Unit n="3.1" kicker="Recall (Ch 0)" title="Every vector is a recipe of î and ĵ">
@@ -537,6 +579,21 @@ export default function Matrices() {
           answer={1}
           explain="A shift (translation) moves the origin: T(0) ≠ 0, breaking linearity. Rotations and scalings keep the origin fixed and lines straight."
         />
+        <p style={{ marginTop: 16 }}>
+          Now judge by picture. Three of these four grids are produced by a linear map; one is not.
+        </p>
+        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', margin: '4px 0' }}>
+          <MiniGrid f={linMap(rotation(30))} label="A" />
+          <MiniGrid f={linMap({ a: 1, b: 0, c: 0.6, d: 1 })} label="B" />
+          <MiniGrid f={(p) => ({ x: p.x, y: p.y + 0.35 * Math.sin(p.x * 1.4) })} label="C" />
+          <MiniGrid f={linMap(scaling(1.4, 0.7))} label="D" />
+        </div>
+        <Check
+          prompt="Which grid is NOT a linear map?"
+          options={['A — a rotation', 'B — a shear', 'C — the wavy one', 'D — a scaling']}
+          answer={2}
+          explain="Only C bends straight grid lines into curves, so it cannot be linear (a linear map sends straight lines to straight lines, evenly spaced, origin fixed). A rotation, B shear and D scaling all keep the lines straight."
+        />
       </Unit>
 
       <Unit n="3.3" kicker="The key idea" title="Where î and ĵ go decides everything">
@@ -559,19 +616,15 @@ export default function Matrices() {
         <ApplyToSpaceLab />
       </Unit>
 
-      <Unit n="3.8" kicker="Vocabulary" title="A field guide to common maps">
-        <GalleryLab />
-      </Unit>
-
-      <Unit n="3.9" kicker="Edge case" title="When space collapses">
+      <Unit n="3.8" kicker="Edge case" title="When space collapses">
         <CollapseLab />
       </Unit>
 
-      <Unit n="3.10" kicker="Special family" title="Rigid motions (orthogonal matrices)">
+      <Unit n="3.9" kicker="Special family" title="Rigid motions (orthogonal matrices)">
         <OrthogonalLab />
       </Unit>
 
-      <Unit n="3.11" kicker="Looking up" title="What changes in higher dimensions?">
+      <Unit n="3.10" kicker="Looking up" title="What changes in higher dimensions?">
         <p>
           Nothing about the <i>idea</i> changes — only the counting. In 3D there are three basis vectors
           <Tex>{String.raw`\,\hat\imath, \hat\jmath, \hat k`}</Tex>, so a map needs <b>three landing
@@ -592,7 +645,7 @@ export default function Matrices() {
         />
       </Unit>
 
-      <Unit n="3.12" kicker="Recap" title="What you can now do, and what's next">
+      <Unit n="3.11" kicker="Recap" title="What you can now do, and what's next">
         <Observation>
           <b>In one sentence:</b> a matrix is a linear map written down — its columns are where the basis
           vectors land, and multiplying it by a vector rebuilds that vector's recipe from those columns.

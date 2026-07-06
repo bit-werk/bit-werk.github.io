@@ -115,10 +115,15 @@ function SystemLab() {
         <Btn active={mode === 'col'} onClick={() => setMode('col')}>Column picture</Btn>
       </div>
       <div className="mat-times-vec">
-        <MatrixInput value={A} onChange={setA} columnLabels={false} step={1} />
-        <ColVec value={{ x: 1, y: 1 }} onChange={() => {}} color="#adb5bd" />
-        <span className="op">=</span>
-        <ColVec value={bvec} onChange={setBvec} color={C.b} />
+        {/* group A·x and =b so a narrow panel wraps between them, not mid-term */}
+        <div className="mtv-group">
+          <MatrixInput value={A} onChange={setA} columnLabels={false} step={1} />
+          <ColVec value={{ x: 1, y: 1 }} onChange={() => {}} color="#adb5bd" />
+        </div>
+        <div className="mtv-group">
+          <span className="op">=</span>
+          <ColVec value={bvec} onChange={setBvec} color={C.b} />
+        </div>
       </div>
       <p className="small muted" style={{ marginTop: -2 }}>
         (the middle column is the unknown <Tex>{String.raw`x`}</Tex>; edit A and b.)
@@ -133,7 +138,7 @@ function SystemLab() {
       ) : (
         <p>
           <b>Column picture.</b> Rewrite the system as{' '}
-          <Tex>{String.raw`x_1\,\text{col}_1 + x_2\,\text{col}_2 = b`}</Tex>. Solving asks: <b>which
+          <Tex>{String.raw`x_1\,\textcolor{${C.c1}}{\text{col}_1} + x_2\,\textcolor{${C.c2}}{\text{col}_2} = \textcolor{${C.b}}{b}`}</Tex>. Solving asks: <b>which
           combination</b> of the columns lands on <b style={{ color: C.b }}>b</b>?
         </p>
       )}
@@ -184,7 +189,7 @@ export default function Systems() {
           Two equations in two unknowns, <Tex>{String.raw`a x_1 + c x_2 = b_1`}</Tex> and{' '}
           <Tex>{String.raw`b x_1 + d x_2 = b_2`}</Tex>, stack into a single matrix equation:
         </p>
-        <Tex block>{String.raw`\begin{bmatrix} a & c \\ b & d \end{bmatrix}\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} b_1 \\ b_2 \end{bmatrix} \qquad\text{i.e.}\qquad A x = b.`}</Tex>
+        <Tex block>{String.raw`\begin{bmatrix} \textcolor{${C.c1}}{a} & \textcolor{${C.c2}}{c} \\ \textcolor{${C.c1}}{b} & \textcolor{${C.c2}}{d} \end{bmatrix}\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \textcolor{${C.b}}{\begin{bmatrix} b_1 \\ b_2 \end{bmatrix}} \qquad\text{i.e.}\qquad A x = \textcolor{${C.b}}{b}.`}</Tex>
         <p>
           From Chapter 1 we already know one equation <Tex>{String.raw`n^{\top} x = r`}</Tex> is a line
           (perpendicular to its normal <Tex>{String.raw`n`}</Tex>). A system is several such lines at once.

@@ -141,20 +141,22 @@ export default function App() {
 
       <main className="content">
         <Comp onNavigate={go} />
-        <div className="flow-nav">
-          {prev ? (
-            <button className="flow-btn" onClick={() => go(prev.id)}>
-              ← {prev.label}
-            </button>
-          ) : (
-            <span />
-          )}
-          {next && (
-            <button className="flow-btn primary" onClick={() => go(next.id)}>
-              {next.label} →
-            </button>
-          )}
-        </div>
+        {active !== 'home' && (
+          <div className="flow-nav">
+            {prev ? (
+              <button className="flow-btn" onClick={() => go(prev.id)}>
+                ← {prev.label}
+              </button>
+            ) : (
+              <span />
+            )}
+            {next && (
+              <button className="flow-btn primary" onClick={() => go(next.id)}>
+                {next.label} →
+              </button>
+            )}
+          </div>
+        )}
         <footer className="footer">
           An interactive book in progress · drag, scrub, and experiment freely.
         </footer>

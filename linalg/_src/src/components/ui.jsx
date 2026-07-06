@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { fmt } from '../lib/math.js'
 
 // Accordion controller for a chapter: tracks the ordered units and which one is
 // open ("in focus"). Wrap a chapter's body in <Module> so its <Unit>s collapse.
@@ -42,11 +41,16 @@ export function Btn({ children, onClick, active, ghost }) {
   )
 }
 
-export function PresetRow({ presets, onPick }) {
+export function PresetRow({ presets, onPick, active = null }) {
   return (
     <div className="preset-row">
       {presets.map((p) => (
-        <button key={p.label} className="chip" onClick={() => onPick(p.value)} title={p.title}>
+        <button
+          key={p.label}
+          className={`chip ${active === p.label ? 'active' : ''}`}
+          onClick={() => onPick(p.value, p.label)}
+          title={p.title}
+        >
           {p.label}
         </button>
       ))}
@@ -62,22 +66,6 @@ export function Stat({ label, value, color, hint }) {
         {value}
       </span>
     </div>
-  )
-}
-
-// Render a 2x2 matrix as a small bracketed readout.
-export function MatrixView({ M, p = 2, color }) {
-  return (
-    <span className="matrix-view" style={color ? { color } : undefined}>
-      <span className="mv-bracket">[</span>
-      <span className="mv-grid">
-        <span>{fmt(M.a, p)}</span>
-        <span>{fmt(M.c, p)}</span>
-        <span>{fmt(M.b, p)}</span>
-        <span>{fmt(M.d, p)}</span>
-      </span>
-      <span className="mv-bracket">]</span>
-    </span>
   )
 }
 

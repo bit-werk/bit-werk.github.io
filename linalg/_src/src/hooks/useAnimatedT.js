@@ -6,12 +6,19 @@ const ease = (t) => t * t * (3 - 2 * t)
 /**
  * Drives a value `t` (0..1) for animating "apply transformation" transitions.
  * Returns { t, play, reset, playing } where `t` is already eased.
+ * Animations always start from the *current* value, so play/reset/scrub never
+ * jump to an endpoint first.
  */
 export function useAnimatedT(duration = 900) {
-  const [raw, setRaw] = useState(0)
+  const [raw, setRawState] = useState(0)
   const [playing, setPlaying] = useState(false)
   const frame = useRef(0)
-  const dir = useRef(1)
+  const rawRef = useRef(0)
+
+  const setRaw = useCallback((v) => {
+    rawRef.current = v
+    setRawState(v)
+  }, [])
 
   const stop = () => cancelAnimationFrame(frame.current)
 
@@ -20,11 +27,10 @@ export function useAnimatedT(duration = 900) {
       stop()
       setPlaying(true)
       const start = performance.now()
-      const from = dir.current === 1 ? 0 : 1
+      const from = rawRef.current // begin from wherever we actually are
       const step = (now) => {
         const k = Math.min((now - start) / duration, 1)
-        const v = from + (target - from) * k
-        setRaw(v)
+        setRaw(from + (target - from) * k)
         if (k < 1) {
           frame.current = requestAnimationFrame(step)
         } else {
@@ -33,23 +39,15 @@ export function useAnimatedT(duration = 900) {
       }
       frame.current = requestAnimationFrame(step)
     },
-    [duration],
+    [duration, setRaw],
   )
 
-  const play = useCallback(() => {
-    dir.current = 1
-    animate(1)
-  }, [animate])
-
-  const reset = useCallback(() => {
-    dir.current = 0
-    animate(0)
-  }, [animate])
-
+  const play = useCallback(() => animate(1), [animate])
+  const reset = useCallback(() => animate(0), [animate])
   const toggle = useCallback(() => {
-    if (raw > 0.5) reset()
+    if (rawRef.current > 0.5) reset()
     else play()
-  }, [raw, play, reset])
+  }, [play, reset])
 
   useEffect(() => () => stop(), [])
 

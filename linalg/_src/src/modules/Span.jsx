@@ -6,6 +6,7 @@ import Quiz from '../components/Quiz.jsx'
 import { Tex } from '../components/Tex.jsx'
 import { Module, Unit, Observation, Split, Stat, Formal, Expert } from '../components/ui.jsx'
 import { inverse, apply, fmt, normalize } from '../lib/math.js'
+import { knum, kcol } from '../lib/texfmt.js'
 
 const sc = (v, k) => ({ x: v.x * k, y: v.y * k })
 const add = (a, b) => ({ x: a.x + b.x, y: a.y + b.y })
@@ -85,7 +86,7 @@ function SpanTwoLab() {
       </p>
       {coords ? (
         <>
-          <Tex block>{String.raw`\text{target} = \textcolor{${C.u}}{${fmt(a)}}\,u + \textcolor{${C.w}}{${fmt(b)}}\,w`}</Tex>
+          <Tex block>{String.raw`\text{target} = ${knum(C.u, a)}\,${kcol(C.u, u.x, u.y)} + ${knum(C.w, b)}\,${kcol(C.w, w.x, w.y)} = ${kcol(C.t, target.x, target.y)}`}</Tex>
           <div className="stat-row">
             <Stat label="a (amount of u)" value={fmt(a)} color={C.u} />
             <Stat label="b (amount of w)" value={fmt(b)} color={C.w} />
@@ -193,7 +194,7 @@ function BasisLab() {
         grid</b>. Every point then has <b>exactly one</b> address <Tex>{String.raw`(a, b)`}</Tex> in that
         grid. Such a spanning, independent pair is a <b>basis</b>.
       </p>
-      <Tex block>{String.raw`\text{target} = \textcolor{${C.u}}{${fmt(a)}}\,u + \textcolor{${C.w}}{${fmt(b)}}\,w`}</Tex>
+      <Tex block>{String.raw`\text{target} = ${knum(C.u, a)}\,${kcol(C.u, u.x, u.y)} + ${knum(C.w, b)}\,${kcol(C.w, w.x, w.y)} = ${kcol(C.t, target.x, target.y)}`}</Tex>
       <div className="stat-row">
         <Stat label="coordinate a" value={fmt(a)} color={C.u} />
         <Stat label="coordinate b" value={fmt(b)} color={C.w} />

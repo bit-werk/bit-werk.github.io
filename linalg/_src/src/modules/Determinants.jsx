@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import Plane, { Vector, DraggableVector, Segment, usePlane } from '../components/Plane.jsx'
+import Plane, { Vector, DraggableVector, Segment, UnitSquare, usePlane } from '../components/Plane.jsx'
 import MatrixInput from '../components/MatrixInput.jsx'
 import Quiz from '../components/Quiz.jsx'
 import Check from '../components/Check.jsx'
 import { Tex } from '../components/Tex.jsx'
-import { Module, Unit, Observation, Split, Formal, Stat, PresetRow, MatrixView, Expert } from '../components/ui.jsx'
+import { Module, Unit, Observation, Split, Formal, Stat, PresetRow, Expert } from '../components/ui.jsx'
 import { det, multiply, projectOnto, fmt } from '../lib/math.js'
+import { kmat } from '../lib/texfmt.js'
 
 const C = { u: '#1769ff', v: '#e8590c', h: '#7c5cff' }
 const sc = (p, k) => ({ x: p.x * k, y: p.y * k })
@@ -93,6 +94,57 @@ function AreaLab() {
   )
 }
 
+/* 6.2 — why ad − bc is base × height (self-contained visual for the derivation) */
+function WhyLab() {
+  const [u, setU] = useState({ x: 2, y: 0.5 })
+  const [v, setV] = useState({ x: 0.6, y: 1.6 })
+  const M = { a: u.x, b: u.y, c: v.x, d: v.y }
+  const D = det(M)
+  const base = Math.hypot(u.x, u.y)
+  // signed angle from u to v, in (−π, π]
+  let th = Math.atan2(v.y, v.x) - Math.atan2(u.y, u.x)
+  while (th > Math.PI) th -= 2 * Math.PI
+  while (th < -Math.PI) th += 2 * Math.PI
+  const height = Math.hypot(v.x, v.y) * Math.sin(th) // signed height
+  const color = D > 1e-6 ? '#12b886' : D < -1e-6 ? '#e8590c' : '#e03131'
+  const foot = projectOnto(v, u)
+  return (
+    <Split
+      visual={
+        <Plane size={420} range={4}>
+          <UnitSquare matrix={M} color={color} />
+          <TurnArc u={u} v={v} color={color} />
+          <Segment from={v} to={foot} color={C.h} dashed width={2.5} />
+          <DraggableVector value={u} onChange={setU} color={C.u} label="u (base)" snap={0.25} />
+          <DraggableVector value={v} onChange={setV} color={C.v} label="v" snap={0.25} />
+        </Plane>
+      }
+    >
+      <p>
+        The claim: the parallelogram's signed area is <b>base × height</b>, and the arithmetic{' '}
+        <Tex>{String.raw`u_1 v_2 - u_2 v_1`}</Tex> computes exactly that. Take{' '}
+        <b style={{ color: C.u }}>u</b> as the base. The <b>height</b> is the part of{' '}
+        <b style={{ color: C.v }}>v</b> perpendicular to u — the{' '}
+        <span style={{ color: C.h }}><b>purple segment</b></span> — with length{' '}
+        <Tex>{String.raw`|v|\sin\theta`}</Tex>, where <Tex>{String.raw`\theta`}</Tex> is the signed angle
+        from u to v (the colored arc):
+      </p>
+      <Tex block>{String.raw`\text{signed area} = |u|\cdot|v|\sin\theta`}</Tex>
+      <div className="stat-row">
+        <Stat label="base |u|" value={fmt(base)} color={C.u} />
+        <Stat label="height |v|·sin θ" value={fmt(height)} color={C.h} />
+        <Stat label="base × height" value={fmt(base * height)} />
+        <Stat label="u₁v₂ − u₂v₁" value={fmt(D)} color={color} />
+      </div>
+      <Observation>
+        Drag u and v anywhere: the last two numbers <b>always agree</b> — that equality is what we now
+        prove. Push v past u (clockwise) and both flip sign together: a negative height is exactly a
+        flipped orientation.
+      </Observation>
+    </Split>
+  )
+}
+
 /* 6.4 — multiplicativity */
 function DetMultLab() {
   const [A, setA] = useState({ a: 2, b: 0, c: 1, d: 1 })
@@ -106,11 +158,11 @@ function DetMultLab() {
       visual={
         <div className="compute-box">
           <div className="mgrid-row">
-            <div className="mgrid-wrap"><div className="mgrid-label">A</div><MatrixView M={A} /></div>
+            <div className="mgrid-wrap"><div className="mgrid-label">A</div><Tex>{kmat(A)}</Tex></div>
             <span className="mgrid-op">·</span>
-            <div className="mgrid-wrap"><div className="mgrid-label">B</div><MatrixView M={B} /></div>
+            <div className="mgrid-wrap"><div className="mgrid-label">B</div><Tex>{kmat(B)}</Tex></div>
             <span className="mgrid-op">=</span>
-            <div className="mgrid-wrap"><div className="mgrid-label">AB</div><MatrixView M={AB} /></div>
+            <div className="mgrid-wrap"><div className="mgrid-label">AB</div><Tex>{kmat(AB)}</Tex></div>
           </div>
           <div className="compute-result" style={{ textAlign: 'center' }}>
             <div>det A · det B = <b>{fmt(dA)} · {fmt(dB)} = {fmt(dA * dB)}</b></div>
@@ -171,35 +223,69 @@ export default function Determinants() {
       </Unit>
 
       <Unit n="6.2" kicker="Why" title="Where ad − bc comes from">
-        <p>
-          Why should the arithmetic <Tex>{String.raw`u_1 v_2 - u_2 v_1`}</Tex> equal an <b>area</b>? Start
-          from <b>base × height</b>. Take <Tex>{String.raw`u`}</Tex> as the base, length{' '}
-          <Tex>{String.raw`|u|`}</Tex>. The height is the part of <Tex>{String.raw`v`}</Tex>{' '}
-          <b>perpendicular</b> to u, which is <Tex>{String.raw`|v|\sin\theta`}</Tex> (the purple segment
-          above), where <Tex>{String.raw`\theta`}</Tex> is the signed angle from u to v:
+        <WhyLab />
+        <p style={{ marginTop: 18 }}>
+          Now the algebra, in three small steps. <b>Step 1 — write each vector by its length and
+          angle</b> (the same move that explained the dot product in Chapter 1). If u points at angle{' '}
+          <Tex>{String.raw`\alpha`}</Tex> and v at angle <Tex>{String.raw`\beta`}</Tex>, their coordinates
+          are:
         </p>
-        <Tex block>{String.raw`\text{signed area} = |u|\,\big(|v|\sin\theta\big) = |u|\,|v|\sin\theta.`}</Tex>
+        <Tex block>{String.raw`u = \begin{pmatrix} |u|\cos\alpha \\ |u|\sin\alpha \end{pmatrix}, \qquad v = \begin{pmatrix} |v|\cos\beta \\ |v|\sin\beta \end{pmatrix}`}</Tex>
         <p>
-          Now write the columns in polar form — <Tex>{String.raw`u = |u|(\cos\alpha, \sin\alpha)`}</Tex>,{' '}
-          <Tex>{String.raw`v = |v|(\cos\beta, \sin\beta)`}</Tex> — and expand the arithmetic; the{' '}
-          <b>angle-subtraction identity</b> collapses it exactly to that area:
+          <b>Step 2 — substitute into the arithmetic</b> and pull the lengths out front:
         </p>
-        <Tex block>{String.raw`u_1 v_2 - u_2 v_1 = |u|\cos\alpha\,|v|\sin\beta - |u|\sin\alpha\,|v|\cos\beta = |u|\,|v|\,(\sin\beta\cos\alpha - \cos\beta\sin\alpha)`}</Tex>
-        <Tex block>{String.raw`= |u|\,|v|\,\sin(\beta - \alpha) = |u|\,|v|\sin\theta = \det M.`}</Tex>
+        <Tex block>{String.raw`u_1 v_2 - u_2 v_1 = |u|\,|v|\,\big(\cos\alpha\sin\beta - \sin\alpha\cos\beta\big)`}</Tex>
+        <p>
+          <b>Step 3 — recognize the bracket.</b> It is the <b>sine angle-subtraction identity</b>,{' '}
+          <Tex>{String.raw`\sin(\beta - \alpha) = \sin\beta\cos\alpha - \cos\beta\sin\alpha`}</Tex> — the
+          sine-twin of the cosine identity that turned the dot product into{' '}
+          <Tex>{String.raw`|u||v|\cos\theta`}</Tex> in Chapter 1. And <Tex>{String.raw`\beta - \alpha`}</Tex>{' '}
+          is precisely the signed angle <Tex>{String.raw`\theta`}</Tex> from u to v:
+        </p>
+        <Tex block>{String.raw`u_1 v_2 - u_2 v_1 = |u|\,|v|\,\sin(\beta - \alpha) = |u|\,|v|\sin\theta = \text{base} \times \text{height}. \;\; \blacksquare`}</Tex>
         <Observation>
-          So <Tex>{String.raw`\det M = u_1 v_2 - u_2 v_1 = ad - bc`}</Tex> is literally the signed area of the
-          column parallelogram. Notice the perfect rhyme with Chapter 1: the dot product gave{' '}
-          <Tex>{String.raw`|u||v|\cos\theta`}</Tex> (alignment); the determinant gives{' '}
-          <Tex>{String.raw`|u||v|\sin\theta`}</Tex> (spread). The <b>sign</b> is the sign of{' '}
-          <Tex>{String.raw`\sin\theta`}</Tex>: positive when v is counter-clockwise from u, negative when
-          clockwise, zero when collinear.
+          <b>Why this is no coincidence.</b> Rotating both vectors together shifts <Tex>{String.raw`\alpha`}</Tex>{' '}
+          and <Tex>{String.raw`\beta`}</Tex> by the same amount, so the <i>difference</i>{' '}
+          <Tex>{String.raw`\beta - \alpha`}</Tex> — and the parallelogram — don't change. Out of all ways to
+          combine four coordinates, <Tex>{String.raw`u_1v_2 - u_2v_1`}</Tex> is exactly the combination that
+          only feels that difference. Chapter 1 met its partner: the dot product is the{' '}
+          <Tex>{String.raw`\cos(\beta-\alpha)`}</Tex> combination (<b>alignment</b>), the determinant is the{' '}
+          <Tex>{String.raw`\sin(\beta-\alpha)`}</Tex> combination (<b>spread</b>). Two rotation-blind
+          quantities, one trig identity each.
         </Observation>
-        <Formal title="The elegant alternative">
-          Signed area is the <i>only</i> function of the two columns that is <b>linear in each column</b>,{' '}
-          <b>alternating</b> (zero when the columns are equal), and equals <b>1</b> on{' '}
-          <Tex>{String.raw`\hat\imath, \hat\jmath`}</Tex>. Those three rules force the formula{' '}
-          <Tex>{String.raw`ad - bc`}</Tex> with no pictures at all — and they are exactly how the determinant
-          is defined in higher dimensions.
+        <Formal title="The three rules that force ad − bc (no trig, no pictures)">
+          <p style={{ marginTop: 0 }}>
+            There is a second route, and it is how determinants are <i>defined</i> in every dimension.
+            Ask: what properties must "signed area of the column parallelogram", written{' '}
+            <Tex>{String.raw`D(u, v)`}</Tex>, obviously have? Three:
+          </p>
+          <ul className="tight">
+            <li>
+              <b>Rule 1 · normalization:</b> <Tex>{String.raw`D(\hat\imath, \hat\jmath) = 1`}</Tex> — the
+              unit square has area 1.
+            </li>
+            <li>
+              <b>Rule 2 · linearity in each column:</b> scaling one column scales the area (double v ⇒
+              double the height ⇒ double the area), and adding vectors in one slot adds areas:{' '}
+              <Tex>{String.raw`D(u, v + w) = D(u,v) + D(u,w)`}</Tex>.
+            </li>
+            <li>
+              <b>Rule 3 · alternating:</b> <Tex>{String.raw`D(u, u) = 0`}</Tex> — equal columns give a flat
+              parallelogram, no area. (Rules 2+3 together force the swap rule{' '}
+              <Tex>{String.raw`D(v, u) = -D(u, v)`}</Tex>: expand <Tex>{String.raw`D(u{+}v,\,u{+}v) = 0`}</Tex>.)
+            </li>
+          </ul>
+          <p>
+            These three rules leave <b>no freedom at all</b>. Write the columns in the basis,{' '}
+            <Tex>{String.raw`u = a\,\hat\imath + b\,\hat\jmath`}</Tex> and{' '}
+            <Tex>{String.raw`v = c\,\hat\imath + d\,\hat\jmath`}</Tex>, and expand with Rule 2:
+          </p>
+          <Tex block>{String.raw`\begin{aligned} D(u, v) &= ac\,D(\hat\imath,\hat\imath) + ad\,D(\hat\imath,\hat\jmath) + bc\,D(\hat\jmath,\hat\imath) + bd\,D(\hat\jmath,\hat\jmath) \\ &= 0 + ad\cdot 1 + bc\cdot(-1) + 0 = ad - bc. \end{aligned}`}</Tex>
+          <p style={{ marginBottom: 0 }}>
+            So <Tex>{String.raw`ad - bc`}</Tex> is not a formula to memorize — it is the <b>only possible
+            answer</b> once you agree area should behave like area. In n dimensions the same three rules,
+            word for word, define <Tex>{String.raw`\det`}</Tex> for n columns.
+          </p>
         </Formal>
       </Unit>
 

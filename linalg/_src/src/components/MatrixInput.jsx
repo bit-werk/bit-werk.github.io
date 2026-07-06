@@ -22,7 +22,11 @@ export default function MatrixInput({
     onChange?.({ ...value, [key]: Number.isFinite(n) ? n : 0 })
   }
 
-  const Cell = ({ k }) => (
+  // NOTE: inline elements, not a nested <Cell> component. Defining a component
+  // inside render gives it a new identity every render, which remounts the
+  // inputs and drops focus — so a clicked cell wouldn't "stay marked" while the
+  // parent re-renders (e.g. during an animation).
+  const cell = (k) => (
     <input
       type="number"
       step={step}
@@ -39,10 +43,10 @@ export default function MatrixInput({
         <div className="matrix-input">
           <div className="bracket left" />
           <div className="matrix-grid">
-            <Cell k="a" />
-            <Cell k="c" />
-            <Cell k="b" />
-            <Cell k="d" />
+            {cell('a')}
+            {cell('c')}
+            {cell('b')}
+            {cell('d')}
           </div>
           <div className="bracket right" />
         </div>

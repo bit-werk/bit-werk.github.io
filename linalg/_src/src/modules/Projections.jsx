@@ -3,6 +3,8 @@ import Plane, { Vector, DraggableVector, Dot, Segment } from '../components/Plan
 import Quiz from '../components/Quiz.jsx'
 import { Card, Panel, Stat, Experiment } from '../components/ui.jsx'
 import { projectOnto, dot, fmt, normalize } from '../lib/math.js'
+import { Tex } from '../components/Tex.jsx'
+import { kcol } from '../lib/texfmt.js'
 
 export default function Projections() {
   const [v, setV] = useState({ x: 2.5, y: 2.5 })
@@ -13,6 +15,8 @@ export default function Projections() {
   const dHat = normalize(d)
   const scalarProj = dot(v, dHat)
   const errLen = Math.hypot(residual.x, residual.y)
+  const vd = dot(v, d)
+  const dd = dot(d, d)
 
   // a faint extension of the projection line across the plane
   const big = 8
@@ -61,7 +65,7 @@ export default function Projections() {
 
           <Panel title="The formula, made visual">
             <div className="formula">
-              proj<sub>d</sub>(v) = ( v·d / d·d ) d
+              <Tex block>{String.raw`\begin{aligned} \operatorname{proj}_{\textcolor{#1769ff}{d}}(\textcolor{#12b886}{v}) &= \frac{\textcolor{#12b886}{v}\cdot\textcolor{#1769ff}{d}}{\textcolor{#1769ff}{d}\cdot\textcolor{#1769ff}{d}}\;\textcolor{#1769ff}{d} \\[4pt] &= \frac{${fmt(vd)}}{${fmt(dd)}}\;${kcol('#1769ff', d.x, d.y)} = ${kcol('#7c5cff', p.x, p.y)} \end{aligned}`}</Tex>
             </div>
             <p className="muted small">
               The fraction <b>v·d / d·d</b> is how many copies of d you need. Only the direction of d

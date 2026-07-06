@@ -4,6 +4,8 @@ import MatrixInput from '../components/MatrixInput.jsx'
 import Quiz from '../components/Quiz.jsx'
 import { Card, Panel, PresetRow, Stat, Experiment } from '../components/ui.jsx'
 import { apply, eigen, fmt, normalize, rotation } from '../lib/math.js'
+import { Tex } from '../components/Tex.jsx'
+import { kcol } from '../lib/texfmt.js'
 
 const PRESETS = [
   { label: 'Stretch', value: { a: 2, b: 0, c: 0, d: 0.5 }, title: 'Two real eigen-directions' },
@@ -76,11 +78,14 @@ export default function Eigen() {
 
           <Panel title="Eigenvalues">
             {E.real ? (
-              <div className="stat-row">
-                <Stat label="λ₁" value={fmt(E.values[0])} color="#f59f00" />
-                <Stat label="λ₂" value={fmt(E.values[1])} color="#f59f00" />
-                <Stat label="type" value="real" color="#12b886" />
-              </div>
+              <>
+                <div className="stat-row">
+                  <Stat label="λ₁" value={fmt(E.values[0])} color="#f59f00" />
+                  <Stat label="λ₂" value={fmt(E.values[1])} color="#f59f00" />
+                  <Stat label="type" value="real" color="#12b886" />
+                </div>
+                <Tex block>{String.raw`v_1 = ${kcol('#f59f00', E.vectors[0].x, E.vectors[0].y)}, \quad v_2 = ${kcol('#f59f00', E.vectors[1].x, E.vectors[1].y)}`}</Tex>
+              </>
             ) : (
               <div className="stat-row">
                 <Stat
@@ -116,7 +121,9 @@ export default function Eigen() {
 
       <Card className="reading">
         <h3>The eigenvalue equation, in words</h3>
-        <p className="formula center">M v = λ v</p>
+        <p className="formula center">
+          <Tex>{String.raw`M\,\textcolor{#12b886}{v} = \textcolor{#f59f00}{\lambda}\,\textcolor{#12b886}{v}`}</Tex>
+        </p>
         <ul>
           <li>
             "Applying M to v is the same as just scaling v by λ." v keeps its direction (its line is
