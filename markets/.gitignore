@@ -1,0 +1,13 @@
+# --- source (not served; lives under _src/) ---
+.venv/
+_src/**/__pycache__/
+*.pyc
+_src/frontend/node_modules/
+# generated copies inside the source tree (the real published data is markets/data/)
+_src/frontend/dist/
+_src/frontend/public/data/
+
+.DS_Store
+
+# NOTE: the built app at markets/index.html, markets/assets/ and markets/data/
+# is intentionally committed — that is what GitHub Pages serves at /markets/.
