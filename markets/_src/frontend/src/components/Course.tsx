@@ -1,3 +1,4 @@
+import { Chevron } from "./Chevron";
 import { CHAPTERS } from "../course";
 import { RichText, RichInline } from "./RichText";
 
@@ -13,27 +14,48 @@ export function Course({ index, onSelect }: Props) {
   const ch = index != null ? CHAPTERS[index] : null;
 
   return (
-    <section className="course">
-      <div className="course-top">
-        <h3>Market Cycles &amp; Macroeconomics</h3>
-        <span className="course-sub">A guided history course — click through; the chart follows.</span>
-      </div>
-
-      <div className="course-nav">
-        <button
-          type="button"
-          className="btn"
-          disabled={index == null || index <= 0}
-          onClick={() => onSelect((index ?? 0) - 1)}
-        >
-          ← Prev
+    <section className="panel course">
+      <div className="panel-col">
+        <div className="panel-main panel-fit">
+      {ch ? (
+        <article className="chapter">
+          <div className="chapter-top">
+            <h3 className="chapter-title">{ch.title}</h3>
+            <span className="chapter-era">{ch.era}</span>
+            <span className="chapter-n">
+              Chapter {index! + 1} of {CHAPTERS.length}
+            </span>
+          </div>
+          <p className="chapter-look">
+            <span className="chapter-look-k">Look for</span>{" "}
+            <RichInline text={ch.observe} />
+          </p>
+          <div className="chapter-body">
+            <RichText text={ch.body} />
+          </div>
+        </article>
+      ) : (
+        <div className="panel-intro">
+          <p>
+            <RichInline text="A short history of booms, bubbles, wars and policy, and the ideas ([[keynes|Keynes]], [[hyman-minsky|Minsky]], [[robert-shiller|Shiller]], [[friedman|Friedman]]) that explain them." />
+          </p>
+          <button type="button" className="link strong" onClick={() => onSelect(0)}>
+            Begin with chapter 1
+          </button>
+        </div>
+      )}
+        </div>
+        <div className="nav">
+        <button type="button" className="link nav-step" aria-label="Previous" disabled={index == null || index <= 0} onClick={() => onSelect((index ?? 0) - 1)}>
+          <Chevron dir="left" />
         </button>
         <select
-          className="course-select"
+          className="pick"
+          aria-label="Choose a chapter"
           value={index ?? ""}
           onChange={(e) => onSelect(e.target.value === "" ? null : Number(e.target.value))}
         >
-          <option value="">Start the course…</option>
+          <option value="">Choose a chapter</option>
           {CHAPTERS.map((c, i) => (
             <option key={c.id} value={i}>
               {i + 1}. {c.title}
@@ -42,46 +64,15 @@ export function Course({ index, onSelect }: Props) {
         </select>
         <button
           type="button"
-          className="btn"
-          disabled={index == null || index >= CHAPTERS.length - 1}
+          className="link nav-step"
+          aria-label="Next"
+          disabled={index != null && index >= CHAPTERS.length - 1}
           onClick={() => onSelect((index ?? -1) + 1)}
         >
-          Next →
+          <Chevron dir="right" />
         </button>
       </div>
-
-      {ch ? (
-        <article className="course-card">
-          <div className="course-head">
-            <span className="course-era">{ch.era}</span>
-            <strong>{ch.title}</strong>
-            <button type="button" className="course-exit" onClick={() => onSelect(null)}>
-              Exit
-            </button>
-          </div>
-          <div className="course-observe">
-            <span className="obs-label">Look for</span>
-            <span className="obs-text">
-              <RichInline text={ch.observe} />
-            </span>
-          </div>
-          <div className="course-body">
-            <RichText text={ch.body} />
-          </div>
-          <div className="course-count">
-            Chapter {index! + 1} of {CHAPTERS.length} · hover the underlined terms for definitions
-          </div>
-        </article>
-      ) : (
-        <div className="course-intro">
-          <p>
-            <RichInline text="A short, click-through history of booms, bubbles, wars and policy — and the ideas ([[keynes|Keynes]], [[hyman-minsky|Minsky]], [[robert-shiller|Shiller]], [[friedman|Friedman]]…) that explain them. Each chapter zooms the chart and shows the series that tell the story." />
-          </p>
-          <button type="button" className="btn" onClick={() => onSelect(0)}>
-            Begin the course →
-          </button>
-        </div>
-      )}
+      </div>
     </section>
   );
 }

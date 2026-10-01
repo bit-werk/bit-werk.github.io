@@ -36,7 +36,7 @@ function Term({ slug, text }: { slug: string; text: string }) {
         <span className="term-pop-title">{g.term}</span>
         <span className="term-pop-def">{g.short}</span>
         <a href={g.url} target="_blank" rel="noreferrer">
-          Wikipedia →
+          Wikipedia
         </a>
       </span>
     </span>

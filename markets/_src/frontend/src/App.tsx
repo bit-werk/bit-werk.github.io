@@ -2,12 +2,23 @@ import { useEffect, useMemo, useState } from "react";
 import type { Dataset, MacroDataset, IndicesDataset, MarketRecord } from "./types";
 import { SERIES } from "./series";
 import { MarketChart } from "./components/MarketChart";
-import { LayersMenu } from "./components/LayersMenu";
+import { SeriesIndex } from "./components/SeriesIndex";
 import { Events } from "./components/Events";
+import { ThemeMenu } from "./components/ThemeMenu";
+import { applyTheme, DEFAULT_THEME, THEMES } from "./design";
+import { Sources } from "./components/Sources";
 import { Course } from "./components/Course";
-import { InfoButton } from "./components/InfoButton";
 import { EVENTS } from "./events";
 import { CHAPTERS } from "./course";
+
+type Tab = "series" | "readout" | "course" | "events" | "sources";
+const TABS: { id: Tab; label: string }[] = [
+  { id: "series", label: "Series" },
+  { id: "readout", label: "Readout" },
+  { id: "course", label: "Course" },
+  { id: "events", label: "Events" },
+  { id: "sources", label: "Sources" },
+];
 
 // Pad an ISO date by whole years (keeps month/day), for the focus window.
 const shiftYear = (iso: string, years: number) =>
@@ -64,6 +75,16 @@ function mergeData(
   return arr;
 }
 
+const loadTheme = () => {
+  try {
+    const t = localStorage.getItem("mc-theme");
+    if (t && THEMES.some((x) => x.id === t)) return t;
+  } catch {
+    /* storage unavailable */
+  }
+  return DEFAULT_THEME;
+};
+
 export function App() {
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const [records, setRecords] = useState<MarketRecord[] | null>(null);
@@ -76,6 +97,22 @@ export function App() {
   const [yAxisMode, setYAxisMode] = useState<"fit" | "manual">("fit");
   const [manualRange, setManualRange] = useState<[number, number] | null>(null);
   const [chapterIndex, setChapterIndex] = useState<number | null>(null);
+  // Narrow screens show one section at a time beneath the chart.
+  const [tab, setTab] = useState<Tab>("series");
+  const [lowerTab, setLowerTab] = useState<"course" | "events">("course");
+  const [theme, setTheme] = useState(loadTheme);
+  // Installed during render so every child (and the canvas tokens) sees the new
+  // palette on the very pass that follows the switch. It is idempotent.
+  applyTheme(theme);
+  const chooseTheme = (id: string) => {
+    setTheme(id);
+    try {
+      localStorage.setItem("mc-theme", id);
+    } catch {
+      /* ignore */
+    }
+  };
+  const [sourcesOpen, setSourcesOpen] = useState(false);
 
   // Switching to manual: seed the range from the visible price-axis series so
   // the user has a sensible starting point to edit.
@@ -107,6 +144,7 @@ export function App() {
   // on the chart).
   const selectChapter = (i: number | null) => {
     setChapterIndex(i);
+    setLowerTab("course");
     if (i == null) return;
     const ch = CHAPTERS[i];
     setVisible(Object.fromEntries(SERIES.map((s) => [s.key, ch.series.includes(s.key)])));
@@ -120,6 +158,7 @@ export function App() {
   const selectEvent = (i: number | null) => {
     setChapterIndex(null);
     setStoryIndex(i);
+    if (i != null) setLowerTab("events");
   };
 
   // Where to zoom the chart. A course chapter takes priority; otherwise the
@@ -168,77 +207,108 @@ export function App() {
   const meta = dataset?.meta;
 
   return (
-    <div className="shell">
-      {dataset && records && (
-        <LayersMenu
-          visible={visible}
-          onToggleSeries={toggleSeries}
-          onToggleMany={toggleMany}
-          onClearAll={clearAll}
-        />
-      )}
-      <div className="app">
-      <header className="app-header">
-        <h1>
-          Market Cycles <InfoButton concept="market-cycle" />
-        </h1>
-        <p className="tagline">
-          Follow the big movements of the stock market across 150+ years. Toggle
-          series, switch to a logarithmic scale, and zoom in. Everything has an{" "}
-          <span className="info-inline">ⓘ</span> — click it to learn what it
-          means.
-        </p>
-      </header>
-
-      {error && (
-        <div className="notice error">
-          Could not load data ({error}). Run the pipeline, then{" "}
-          <code>npm run dev</code> (it copies <code>data/sp500.json</code> in).
-        </div>
-      )}
-
-      {!dataset && !error && <div className="notice">Loading 150 years of data…</div>}
-
-      {dataset && records && (
-        <>
-          <MarketChart
-            data={records}
-            scale={scale}
-            onScale={setScale}
-            visible={visible}
-            onToggleSeries={toggleSeries}
-            annotationsOn={annotationsOn}
-            onToggleAnnotations={() => setAnnotationsOn((v) => !v)}
-            yAxisMode={yAxisMode}
-            onSetYAxisMode={setYMode}
-            manualRange={manualRange}
-            onSetManualRange={setManualRange}
-            focus={focus}
-            activeEventIndex={storyIndex}
-            onSelectEvent={selectEvent}
-            onSelectionActiveChange={setSelectionActive}
-          />
-
-          <div className="lower">
-            <Course index={chapterIndex} onSelect={selectChapter} />
-            <Events index={storyIndex} onSelect={selectEvent} />
+    <div className="page">
+      <div className="sheet" data-tab={tab} data-lower={lowerTab}>
+        <div className="workspace">
+        <header className="mast">
+          <h1>Market Cycles</h1>
+          <p className="slogan">Market history since 1871, read against the economy that moved it.</p>
+          <div className="mast-right">
+            <ThemeMenu value={theme} onChange={chooseTheme} />
+            {dataset && (
+              <button type="button" className="link mast-sources" onClick={() => setSourcesOpen(true)}>
+                Sources
+              </button>
+            )}
           </div>
+        </header>
 
-          <footer className="attribution">
-            Sources:{" "}
-            <a href={meta!.sourceUrl} target="_blank" rel="noreferrer">
-              {meta!.source}
-            </a>{" "}
-            for S&amp;P/CAPE/CPI; stock indices (Nasdaq, Dow, Russell, Nikkei,
-            FTSE, EURO STOXX, SMI, MSCI ACWI) &amp; Bitcoin via Yahoo Finance;
-            VIX via GitHub <code>datasets/finance-vix</code>; gold via GitHub{" "}
-            <code>datasets/gold-prices</code>; US oil &amp; real GDP via GitHub
-            datahub; Fed funds, unemployment, copper &amp; bond yields (US 2y,
-            Swiss/Japan/UK/euro-area 10y) via FRED / OECD; population &amp;
-            international GDP via the World Bank. {meta!.license}
-          </footer>
-        </>
-      )}
+        {error && (
+          <div className="notice error">
+            Could not load data ({error}). Run the pipeline, then <code>npm run dev</code> (it copies{" "}
+            <code>data/sp500.json</code> in).
+          </div>
+        )}
+
+        {!dataset && !error && <div className="notice">Loading 150 years of data…</div>}
+
+        {dataset && records && (
+          <>
+            <SeriesIndex
+              visible={visible}
+              onToggleSeries={toggleSeries}
+              onToggleMany={toggleMany}
+              onClearAll={clearAll}
+            />
+
+            <MarketChart
+              data={records}
+              scale={scale}
+              onScale={setScale}
+              visible={visible}
+              onToggleSeries={toggleSeries}
+              annotationsOn={annotationsOn}
+              onToggleAnnotations={() => setAnnotationsOn((v) => !v)}
+              yAxisMode={yAxisMode}
+              onSetYAxisMode={setYMode}
+              manualRange={manualRange}
+              onSetManualRange={setManualRange}
+              focus={focus}
+              activeEventIndex={storyIndex}
+              onSelectEvent={selectEvent}
+              onSelectionActiveChange={setSelectionActive}
+              theme={theme}
+            />
+            </>
+          )}
+        </div>
+
+        {dataset && records && (
+          <>
+            <nav className="tabs" role="tablist" aria-label="Sections">
+              {TABS.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === t.id}
+                  className={tab === t.id ? "active" : ""}
+                  onClick={() => (t.id === "sources" ? setSourcesOpen(true) : setTab(t.id))}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </nav>
+
+            <div className="lower panel-scroll">
+              <Course index={chapterIndex} onSelect={selectChapter} />
+              <Events index={storyIndex} onSelect={selectEvent} />
+              <div className="lower-tabs" role="tablist" aria-label="Reading panels">
+                {(["course", "events"] as const).map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    role="tab"
+                    aria-selected={lowerTab === t}
+                    className={lowerTab === t ? "active" : ""}
+                    onClick={() => setLowerTab(t)}
+                  >
+                    {t === "course" ? "Market Cycles & Macroeconomics" : "Events"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {sourcesOpen && (
+              <Sources
+                source={meta!.source}
+                sourceUrl={meta!.sourceUrl}
+                license={meta!.license}
+                onClose={() => setSourcesOpen(false)}
+              />
+            )}
+          </>
+        )}
       </div>
     </div>
   );

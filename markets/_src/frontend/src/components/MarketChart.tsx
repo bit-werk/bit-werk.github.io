@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts";
 import type { MarketRecord } from "../types";
 import { SERIES, type SeriesDef } from "../series";
-import { EVENTS, POINT_COLOR, AREA_FILL, AREA_FILL_STRONG } from "../events";
-import { InfoButton } from "./InfoButton";
+import { EVENTS } from "../events";
+import { tok, tone, evColor, bandColor } from "../design";
+import { Explain, ConceptPopover, DWELL_MS, type Anchor } from "./Explain";
+import type { ConceptKey } from "../concepts";
 
 interface Props {
   data: MarketRecord[];
@@ -25,6 +27,8 @@ interface Props {
   onSelectEvent: (index: number) => void;
   /** Notifies parent whether a measurement period is active (suppresses focus). */
   onSelectionActiveChange: (active: boolean) => void;
+  /** Theme id; the canvas restyles itself when it changes. */
+  theme: string;
 }
 
 interface Selection {
@@ -56,6 +60,7 @@ const YEAR_MS = 365.25 * 864e5;
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const monthLabel = (iso: string) => `${MONTHS[+iso.slice(5, 7) - 1]} ${iso.slice(0, 4)}`;
+const yearSpan = (a: string, b: string) => (a.slice(0, 4) === b.slice(0, 4) ? a.slice(0, 4) : `${a.slice(0, 4)}–${b.slice(0, 4)}`);
 const fmt = (n: number, d = 2) =>
   n.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
 const signed = (n: number, d = 2) => (n >= 0 ? "+" : "") + fmt(n, d);
@@ -76,12 +81,40 @@ export function MarketChart({
   activeEventIndex,
   onSelectEvent,
   onSelectionActiveChange,
+  theme,
 }: Props) {
+  const tokRef = useRef(tok);
   const elRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<echarts.ECharts | null>(null);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [, setViewTick] = useState(0); // bumps to reposition axis boxes on zoom/resize
   const bump = () => setViewTick((v) => v + 1);
+
+  // Resting the pointer on a line for a moment explains what that line measures.
+  const [lineCard, setLineCard] = useState<{ concept: ConceptKey; anchor: Anchor } | null>(null);
+  const dwellTimer = useRef<number | null>(null);
+  const dwellAnchor = useRef<{ x: number; y: number; key: string | null } | null>(null);
+  const overCard = useRef(false);
+  const cardShown = useRef(false);
+  const hideTimer = useRef<number | null>(null);
+  const cancelDwell = () => {
+    if (dwellTimer.current != null) window.clearTimeout(dwellTimer.current);
+    dwellTimer.current = null;
+  };
+  const hideCard = () => {
+    cancelDwell();
+    cardShown.current = false;
+    dwellAnchor.current = null;
+    setLineCard(null);
+  };
+  const hideCardSoon = () => {
+    if (hideTimer.current != null) window.clearTimeout(hideTimer.current);
+    hideTimer.current = window.setTimeout(() => {
+      if (!overCard.current) hideCard();
+    }, 280);
+  };
+  const dwellRef = useRef({ hideCard, cancelDwell });
+  dwellRef.current = { hideCard, cancelDwell };
 
   // refs so init-once handlers always see current props
   const dataRef = useRef<MarketRecord[]>(data);
@@ -169,6 +202,24 @@ export function MarketChart({
     if (!elRef.current) return;
     const chart = echarts.init(elRef.current);
     chartRef.current = chart;
+    // A plain wheel over the chart scrolls the page; only Ctrl+wheel (and trackpad
+    // pinch) zooms. ECharts would otherwise swallow every wheel event.
+    const host = elRef.current;
+    // Shift+wheel pans along the time axis (handled here; browsers may report the
+    // delta on either axis when Shift is held).
+    const onWheelCapture = (e: WheelEvent) => {
+      if (e.ctrlKey) return;
+      e.stopPropagation();
+      if (!e.shiftKey) return;
+      e.preventDefault();
+      const dz = (chart.getOption() as { dataZoom?: { start: number; end: number }[] }).dataZoom?.[0];
+      if (!dz) return;
+      const span = dz.end - dz.start;
+      const d = (Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * 0.0015 * span;
+      const start = Math.max(0, Math.min(100 - span, dz.start + d));
+      chart.dispatchAction({ type: "dataZoom", start, end: start + span });
+    };
+    host.addEventListener("wheel", onWheelCapture, { capture: true, passive: false });
     const zr = chart.getZr();
 
     chart.setOption({
@@ -189,11 +240,9 @@ export function MarketChart({
         type: "time",
         minInterval: YEAR_MS,
         axisTick: { show: false },
-        axisLine: { lineStyle: { color: "rgba(0,0,0,0.3)" } },
         axisLabel: {
           hideOverlap: true,
-          color: "rgba(0,0,0,0.62)",
-          fontSize: 10,
+          fontSize: 11,
           formatter: (val: number) => `${new Date(val).getFullYear()}`,
         },
       },
@@ -204,7 +253,7 @@ export function MarketChart({
         { type: "value", min: 0, max: 1, show: false },
       ],
       dataZoom: [
-        { type: "inside", filterMode: "filter", moveOnMouseMove: false, moveOnMouseWheel: true, zoomOnMouseWheel: "ctrl" },
+        { type: "inside", filterMode: "filter", moveOnMouseMove: false, moveOnMouseWheel: false, zoomOnMouseWheel: "ctrl" },
         { type: "slider", filterMode: "filter", bottom: 24, height: 28 },
       ],
       series: [],
@@ -231,7 +280,7 @@ export function MarketChart({
           silent: true,
           z: 100,
           ignore: true,
-          style: { fill: "rgba(37,99,235,0.10)", stroke: "rgba(37,99,235,0.5)", lineWidth: 1 },
+          style: { fill: tokRef.current.band.fill, stroke: tokRef.current.band.stroke, lineWidth: 1 },
           shape: { x: 0, y: 0, width: 0, height: 0 },
         });
         zr.add(bandRef.current);
@@ -281,7 +330,7 @@ export function MarketChart({
       }
     };
     // which line (if any) is right under the cursor — null if not close to one
-    const lineAt = (y: number, t: number): string | null => {
+    const lineAt = (y: number, t: number, reach = 30): string | null => {
       let best: string | null = null;
       let bestDy = Infinity;
       for (const s of visibleSeries()) {
@@ -299,7 +348,7 @@ export function MarketChart({
           best = s.key;
         }
       }
-      return bestDy <= 30 ? best : null;
+      return bestDy <= reach ? best : null;
     };
     // Refresh the panel: a dragged sub-period (band shown) if one exists,
     // otherwise the active series over the whole visible window (no band).
@@ -369,6 +418,7 @@ export function MarketChart({
     };
 
     zr.on("mousedown", (e) => {
+      dwellRef.current.hideCard();
       const x = e.offsetX;
       const y = e.offsetY;
       const ep = edgePixels();
@@ -414,6 +464,36 @@ export function MarketChart({
         commitSelection(t0, t1, true); // real-time
         return;
       }
+      // hover: rest on a line for a couple of seconds to explain it
+      {
+        const { hideCard: hide, cancelDwell: cancel } = dwellRef.current;
+        let key: string | null = null;
+        try {
+          if (inGrid(e.offsetX, e.offsetY)) {
+            key = lineAt(e.offsetY, chart.convertFromPixel({ xAxisIndex: 0 }, e.offsetX) as number, 12);
+          }
+        } catch {
+          /* axis not ready */
+        }
+        const prev = dwellAnchor.current;
+        const moved = !prev || Math.hypot(prev.x - e.offsetX, prev.y - e.offsetY) > 28;
+        if (cardShown.current) {
+          if (moved || key !== prev?.key) hide();
+        } else if (!prev || moved || key !== prev.key || !dwellTimer.current) {
+          cancel();
+          dwellAnchor.current = { x: e.offsetX, y: e.offsetY, key };
+          const def = key ? SERIES.find((s) => s.key === key) : null;
+          if (def) {
+            const cx = (e.event as MouseEvent).clientX;
+            const cy = (e.event as MouseEvent).clientY;
+            dwellTimer.current = window.setTimeout(() => {
+              cardShown.current = true;
+              chart.dispatchAction({ type: "hideTip" });
+              setLineCard({ concept: def.concept, anchor: { x: cx + 6, y: cy + 6 } });
+            }, DWELL_MS);
+          }
+        }
+      }
       // hover: edge cursor
       const ep = edgePixels();
       const near =
@@ -454,11 +534,14 @@ export function MarketChart({
     });
 
     zr.on("globalout", () => {
+      dwellRef.current.cancelDwell();
+      if (cardShown.current) hideCardSoon();
       dragRef.current = null;
       if (elRef.current) elRef.current.style.cursor = "";
     });
 
     chart.on("datazoom", () => {
+      dwellRef.current.hideCard();
       redrawFromTime();
       bump(); // reposition axis boxes
       if (!selRangeRef.current) recompute(); // default view follows the window
@@ -476,12 +559,77 @@ export function MarketChart({
     });
     ro.observe(elRef.current);
     return () => {
+      host.removeEventListener("wheel", onWheelCapture, { capture: true });
       ro.disconnect();
       chart.dispose();
       chartRef.current = null;
       bandRef.current = null;
     };
   }, []);
+
+  // theme: fonts, axes, tooltip, slider and the measurement band follow the design.
+  // (Fonts may still be loading on first paint, so restyle once they are ready.)
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+    const t = tok;
+    const apply = () => {
+      chart.setOption({
+        backgroundColor: "transparent",
+        textStyle: { fontFamily: t.font },
+        tooltip: {
+          backgroundColor: t.tipBg,
+          borderColor: t.tipBorder,
+          borderWidth: 1,
+          padding: [6, 10],
+          textStyle: { color: t.tipText, fontFamily: t.font, fontSize: 12 },
+          extraCssText: "border-radius:0;box-shadow:none;",
+          axisPointer: { lineStyle: { color: t.axis, type: "dashed" }, crossStyle: { color: t.axis } },
+        },
+        xAxis: {
+          axisLine: { lineStyle: { color: t.axis } },
+          axisLabel: { color: t.dim, fontFamily: t.mono, fontSize: 11 },
+        },
+        yAxis: [
+          {
+            axisLabel: { color: t.dim, fontFamily: t.mono, fontSize: 11 },
+            axisLine: { show: false },
+            splitLine: { lineStyle: { color: t.split, type: "dashed" } },
+          },
+          { axisLabel: { color: t.dim, fontFamily: t.mono, fontSize: 11 }, splitLine: { show: false } },
+          {},
+        ],
+        dataZoom: [
+          {},
+          {
+            backgroundColor: "transparent",
+            borderColor: t.sliderBorder,
+            fillerColor: t.sliderFill,
+            dataBackground: {
+              lineStyle: { color: t.sliderData, width: 1 },
+              areaStyle: { color: t.sliderBorder, opacity: 0.5 },
+            },
+            selectedDataBackground: {
+              lineStyle: { color: t.dim, width: 1 },
+              areaStyle: { color: t.sliderFill },
+            },
+            handleStyle: { color: t.labelBg, borderColor: t.dim, borderWidth: 1 },
+            moveHandleStyle: { color: t.sliderData },
+            textStyle: { color: t.dim, fontFamily: t.mono, fontSize: 10 },
+            brushSelect: false,
+          },
+        ],
+      });
+      bandRef.current?.setStyle({ fill: t.band.fill, stroke: t.band.stroke });
+      chartRef.current?.getZr().refresh();
+    };
+    apply();
+    let live = true;
+    document.fonts?.ready.then(() => live && apply());
+    return () => {
+      live = false;
+    };
+  }, [theme]);
 
   // patch series + scale + annotations WITHOUT resetting dataZoom/selection
   useEffect(() => {
@@ -497,8 +645,8 @@ export function MarketChart({
       type: "line" as const,
       yAxisIndex: s.axis === "secondary" ? 1 : 0,
       showSymbol: false,
-      lineStyle: { width: 1.5 },
-      color: s.color,
+      lineStyle: { width: tok.lineWidth },
+      color: tone(s.color),
       data: data
         .map((r) => [r.date, r[s.field] as number | null])
         .filter((p) => p[1] != null),
@@ -520,16 +668,13 @@ export function MarketChart({
       if (annotationsOn) {
         EVENTS.forEach((e, i) => {
           const active = i === activeEventIndex;
-          const c = POINT_COLOR[e.type];
+          const c = evColor(e.type);
           if (e.end) {
-            const fill = active
-              ? AREA_FILL_STRONG[e.type] ?? "rgba(0,0,0,0.12)"
-              : AREA_FILL[e.type] ?? "rgba(0,0,0,0.04)";
             areaData.push([
               {
                 xAxis: e.date,
-                itemStyle: { color: fill },
-                emphasis: { itemStyle: { color: AREA_FILL_STRONG[e.type] ?? "rgba(0,0,0,0.12)" } },
+                itemStyle: { color: bandColor(e.type, active) },
+                emphasis: { itemStyle: { color: bandColor(e.type, true) } },
               },
               { xAxis: e.end },
             ]);
@@ -572,7 +717,7 @@ export function MarketChart({
           return li;
         });
         const labelText = (e: (typeof EVENTS)[number]) =>
-          `${e.tag}  ${e.end ? `${e.date.slice(0, 4)}–${e.end.slice(0, 4)}` : monthLabel(e.date)}`;
+          `${e.tag}  ${e.end ? yearSpan(e.date, e.end) : monthLabel(e.date)}`;
 
         series.push({
           id: "events",
@@ -583,22 +728,21 @@ export function MarketChart({
           symbolSize: 7,
           tooltip: { show: false },
           labelLayout: { hideOverlap: false },
-          label: { show: true, position: "top", rotate: 40, align: "left", fontSize: 10 },
+          label: { show: true, position: "top", rotate: 40, align: "left", fontSize: 11, fontFamily: tok.font },
           emphasis: {
             itemStyle: { opacity: 1 },
             label: {
               opacity: 1,
               fontWeight: "bold",
-              backgroundColor: "#fff",
-              borderColor: "rgba(0,0,0,0.2)",
+              backgroundColor: tok.labelBg,
+              borderColor: tok.axis,
               borderWidth: 1,
-              borderRadius: 4,
               padding: [2, 5],
             },
           },
           data: EVENTS.map((e, i) => {
             const active = i === activeEventIndex;
-            const c = POINT_COLOR[e.type];
+            const c = evColor(e.type);
             return {
               value: [e.date, 1],
               itemStyle: { color: c, opacity: active ? 1 : 0.45 },
@@ -609,9 +753,7 @@ export function MarketChart({
                 fontWeight: active ? "bold" : "normal",
                 offset: [0, -laneOf[i] * LANE_PX],
                 // white "speech-bubble" behind the active label for readability
-                ...(active
-                  ? { backgroundColor: "#fff", borderColor: c, borderWidth: 1, borderRadius: 4, padding: [2, 5] }
-                  : {}),
+                ...(active ? { backgroundColor: tok.labelBg, borderColor: c, borderWidth: 1, padding: [2, 5] } : {}),
               },
             };
           }),
@@ -666,7 +808,7 @@ export function MarketChart({
     }
     recomputeRef.current();
     bump();
-  }, [data, scale, visible, annotationsOn, activeEventIndex, yAxisMode, manualRange]);
+  }, [data, scale, visible, annotationsOn, activeEventIndex, yAxisMode, manualRange, theme]);
 
   // narrative focus: smoothly slide/zoom the window to the event (suppressed by
   // parent if a period is selected — focus arrives as null then)
@@ -767,7 +909,7 @@ export function MarketChart({
       if (!Number.isFinite(y)) continue;
       out.push({
         key: s.key,
-        color: s.color,
+        color: tone(s.color),
         left: s.axis === "price" ? GRID.left - 16 : chart.getWidth() - rightMarginRef.current + 7,
         top: Math.max(top, Math.min(bottom, y)),
       });
@@ -775,170 +917,227 @@ export function MarketChart({
     return out;
   })();
 
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [helpHover, setHelpHover] = useState(false);
+
+  const evListRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    evListRef.current?.querySelector("[data-active]")?.scrollIntoView({ block: "nearest" });
+  }, [activeEventIndex]);
+
   const overlapping = selection
     ? EVENTS.map((e, i) => ({ e, i })).filter(
         ({ e }) =>
           Date.parse(e.date) <= selection.t1 && Date.parse(e.end ?? e.date) >= selection.t0,
       )
     : [];
+  const inViewSet = new Set(overlapping.map((o) => o.i));
 
   return (
-    <div className="chart-area">
-      <div className="chart-toolbar">
-        <div className="toolbar-left">
-          <label className="toolbar-toggle">
-            <input type="checkbox" checked={annotationsOn} onChange={onToggleAnnotations} />
-            Show events
-          </label>
-          <span className="toolbar-y">
-            Scale <InfoButton concept="log-scale" />
-            <span className="segmented small">
-              <button type="button" className={scale === "log" ? "active" : ""} onClick={() => onScale("log")}>
-                Log
-              </button>
-              <button type="button" className={scale === "linear" ? "active" : ""} onClick={() => onScale("linear")}>
-                Linear
-              </button>
-            </span>
-          </span>
-          <span className="toolbar-y">
-            Y-axis:
-            <span className="segmented small">
-              <button
-                type="button"
-                className={yAxisMode === "fit" ? "active" : ""}
-                onClick={() => onSetYAxisMode("fit")}
-                title="Auto-scale to the data currently in view"
-              >
-                Auto
-              </button>
-              <button
-                type="button"
-                className={yAxisMode === "manual" ? "active" : ""}
-                onClick={() => onSetYAxisMode("manual")}
-                title="Set the left axis range by hand"
-              >
-                Manual
-              </button>
-            </span>
-            {yAxisMode === "manual" && manualRange && (
-              <span className="y-manual">
-                <input
-                  type="number"
-                  value={manualRange[0]}
-                  onChange={(e) => onSetManualRange([Number(e.target.value), manualRange[1]])}
-                  aria-label="Y-axis minimum"
-                />
-                <span>–</span>
-                <input
-                  type="number"
-                  value={manualRange[1]}
-                  onChange={(e) => onSetManualRange([manualRange[0], Number(e.target.value)])}
-                  aria-label="Y-axis maximum"
-                />
-              </span>
-            )}
-          </span>
-        </div>
-      </div>
+    <>
+      <div className="tools">
+        <button
+          type="button"
+          className={"tg" + (annotationsOn ? " active" : "")}
+          aria-pressed={annotationsOn}
+          onClick={onToggleAnnotations}
+        >
+          Events
+        </button>
 
-      <div className="chart-row">
-        <div className="chart-wrap">
-          <div className="chart" ref={elRef} />
-          <div className="axis-boxes">
-            {axisBoxes.map((b) => (
-              <button
-                key={b.key}
-                type="button"
-                className="axis-box"
-                title="Toggle this series"
-                style={{ left: b.left, top: b.top, background: b.color, borderColor: b.color }}
-                onClick={() => onToggleSeries(b.key)}
-              />
-            ))}
-          </div>
-          <div className="chart-underbar">
-            <button type="button" className="btn" onClick={resetZoom}>
-              Reset zoom
+        <span className="tool">
+          <Explain concept="log-scale" className="tool-k">
+            Scale
+          </Explain>
+          <span className="seg" role="group" aria-label="Price scale">
+            <button type="button" className={scale === "log" ? "active" : ""} onClick={() => onScale("log")}>
+              Log
             </button>
-            <span className="chart-hint">
-              Drag a line to measure · drag a band's edge to adjust · click an event label
+            <button type="button" className={scale === "linear" ? "active" : ""} onClick={() => onScale("linear")}>
+              Linear
+            </button>
+          </span>
+        </span>
+
+        <span className="tool">
+          <span className="tool-k">Y-axis</span>
+          <span className="seg" role="group" aria-label="Y-axis range">
+            <button
+              type="button"
+              className={yAxisMode === "fit" ? "active" : ""}
+              onClick={() => onSetYAxisMode("fit")}
+              title="Auto-scale to the data currently in view"
+            >
+              Auto
+            </button>
+            <button
+              type="button"
+              className={yAxisMode === "manual" ? "active" : ""}
+              onClick={() => onSetYAxisMode("manual")}
+              title="Set the left axis range by hand"
+            >
+              Manual
+            </button>
+          </span>
+          {yAxisMode === "manual" && manualRange && (
+            <span className="y-manual">
+              <input
+                type="number"
+                value={manualRange[0]}
+                onChange={(e) => onSetManualRange([Number(e.target.value), manualRange[1]])}
+                aria-label="Y-axis minimum"
+              />
+              <span>to</span>
+              <input
+                type="number"
+                value={manualRange[1]}
+                onChange={(e) => onSetManualRange([manualRange[0], Number(e.target.value)])}
+                aria-label="Y-axis maximum"
+              />
             </span>
-          </div>
-        </div>
-
-        <aside className="selection-panel">
-          {selection ? (
-            <>
-              <div className="sp-head">
-                <span className="swatch" style={{ background: selection.color }} />
-                <strong>{selection.seriesLabel}</strong>
-                {selection.isDrag && (
-                  <button type="button" className="sel-close" onClick={clearSelection} aria-label="Clear selection">
-                    ✕
-                  </button>
-                )}
-              </div>
-              <div className="sp-sub">{selection.isDrag ? "Selected period" : "Whole view"}</div>
-              <ul className="sp-list">
-                <li>
-                  <span className="sp-k">Period</span>
-                  <span className="sp-v">{selection.startDate} → {selection.endDate}</span>
-                </li>
-                <li>
-                  <span className="sp-k">Duration</span>
-                  <span className="sp-v">{fmt(selection.years, 1)} yr</span>
-                </li>
-                <li>
-                  <span className="sp-k">From → To</span>
-                  <span className="sp-v">{fmt(selection.startVal)} → {fmt(selection.endVal)}</span>
-                </li>
-                <li>
-                  <span className="sp-k">Change</span>
-                  <span className={"sp-v " + (selection.diff >= 0 ? "up" : "down")}>
-                    {signed(selection.diff)} ({signed(selection.pct, 1)}%)
-                  </span>
-                </li>
-                {selection.cagr != null && (
-                  <li>
-                    <span className="sp-k">Annualized</span>
-                    <span className={"sp-v " + (selection.cagr >= 0 ? "up" : "down")}>
-                      {signed(selection.cagr, 1)}% / yr
-                    </span>
-                  </li>
-                )}
-              </ul>
-
-              <div className="sp-events">
-                <span className="sp-k">{selection.isDrag ? "Events in this period" : "Events in view"}</span>
-                {overlapping.length ? (
-                  <ul>
-                    {overlapping.map(({ e, i }) => (
-                      <li key={e.id}>
-                        <button
-                          type="button"
-                          className={"sp-ev" + (i === activeEventIndex ? " active" : "")}
-                          onClick={() => onSelectEvent(i)}
-                        >
-                          <span className="sp-ev-dot" style={{ background: POINT_COLOR[e.type] }} />
-                          <span className="sp-ev-when">
-                            {e.end ? `${e.date.slice(0, 4)}–${e.end.slice(0, 4)}` : monthLabel(e.date)}
-                          </span>
-                          <span className="sp-ev-title">{e.title}</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="sp-empty">No major events in this window.</p>
-                )}
-              </div>
-            </>
-          ) : (
-            <p className="sp-empty">Toggle on a series to see its stats.</p>
           )}
-        </aside>
+        </span>
+
+        <button type="button" className="link" onClick={resetZoom}>
+          Reset zoom
+        </button>
+
+        <span className="help">
+          <button
+            type="button"
+            className="help-btn"
+            aria-expanded={helpOpen}
+            aria-label="How to use the chart"
+            onClick={() => setHelpOpen((v) => !v)}
+            onMouseEnter={() => setHelpHover(true)}
+            onMouseLeave={() => setHelpHover(false)}
+            onFocus={() => setHelpHover(true)}
+            onBlur={() => setHelpHover(false)}
+          >
+            ?
+          </button>
+          {(helpOpen || helpHover) && (
+            <span className="help-pop" role="note">
+              Drag across a line to measure a period. Drag the band's edge to adjust it. Click an event label for its story. Hold Ctrl and scroll to zoom; hold Shift and scroll to move back and forth in time.
+            </span>
+          )}
+        </span>
       </div>
-    </div>
+
+      <div className="plot">
+        <div className="chart-box">
+        <div className="chart" ref={elRef} />
+        <div className="axis-boxes">
+          {axisBoxes.map((b) => (
+            <button
+              key={b.key}
+              type="button"
+              className="axis-box"
+              title="Remove this series from the chart"
+              aria-label="Remove this series from the chart"
+              style={{ left: b.left, top: b.top, ["--c" as string]: b.color }}
+              onClick={() => onToggleSeries(b.key)}
+            >
+              <svg viewBox="0 0 8 8" width="8" height="8" aria-hidden="true">
+                <path d="M1 1 7 7M7 1 1 7" stroke="currentColor" strokeWidth="1.4" fill="none" />
+              </svg>
+            </button>
+          ))}
+        </div>
+        </div>
+        {lineCard && (
+          <ConceptPopover
+            concept={lineCard.concept}
+            anchor={lineCard.anchor}
+            onEnter={() => {
+              overCard.current = true;
+            }}
+            onLeave={() => {
+              overCard.current = false;
+              hideCardSoon();
+            }}
+          />
+        )}
+      </div>
+
+      <aside className="readout" aria-live="polite">
+        <div className="ro-inner">
+        <div className="ro-top">
+        {selection ? (
+          <>
+            <div className="ro-head">
+              <span className="ro-key" style={{ ["--c" as string]: tone(selection.color) }} aria-hidden="true" />
+              <strong className="ro-name">{selection.seriesLabel}</strong>
+              {selection.isDrag && (
+                <button type="button" className="link ro-close" onClick={clearSelection}>
+                  Clear
+                </button>
+              )}
+            </div>
+            <div className="ro-sub">{selection.isDrag ? "Selected period" : "Whole view"}</div>
+            <ul className="ro-list">
+              <li>
+                <span className="ro-k">Period</span>
+                <span className="ro-v">
+                  {selection.startDate} to {selection.endDate}
+                </span>
+              </li>
+              <li>
+                <span className="ro-k">Duration</span>
+                <span className="ro-v">{fmt(selection.years, 1)} yr</span>
+              </li>
+              <li>
+                <span className="ro-k">From, to</span>
+                <span className="ro-v">
+                  {fmt(selection.startVal)} to {fmt(selection.endVal)}
+                </span>
+              </li>
+              <li>
+                <span className="ro-k">Change</span>
+                <span className={"ro-v " + (selection.diff >= 0 ? "up" : "down")}>
+                  {signed(selection.diff)} ({signed(selection.pct, 1)}%)
+                </span>
+              </li>
+              <li>
+                <span className="ro-k">Annualized</span>
+                {selection.cagr != null ? (
+                  <span className={"ro-v " + (selection.cagr >= 0 ? "up" : "down")}>
+                    {signed(selection.cagr, 1)}% / yr
+                  </span>
+                ) : (
+                  <span className="ro-v">n/a</span>
+                )}
+              </li>
+            </ul>
+          </>
+        ) : (
+          <p className="ro-empty">Choose a series from the index to see its figures.</p>
+        )}
+        </div>
+        <div className="ro-events" ref={evListRef}>
+          <span className="ro-k">Events</span>
+          <ul>
+            {EVENTS.map((e, i) => {
+              const inView = inViewSet.has(i);
+              return (
+                <li key={e.id}>
+                  <button
+                    type="button"
+                    data-active={i === activeEventIndex || undefined}
+                    className={"ro-ev" + (inView ? " in" : " out") + (i === activeEventIndex ? " active" : "")}
+                    onClick={() => onSelectEvent(i)}
+                  >
+                    <span className="ro-ev-dot" style={{ ["--c" as string]: evColor(e.type) }} aria-hidden="true" />
+                    <span className="ro-ev-when">{e.end ? yearSpan(e.date, e.end) : monthLabel(e.date)}</span>
+                    <span className="ro-ev-title">{e.title}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        </div>
+      </aside>
+    </>
   );
 }
