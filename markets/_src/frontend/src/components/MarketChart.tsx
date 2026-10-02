@@ -29,6 +29,8 @@ interface Props {
   onSelectionActiveChange: (active: boolean) => void;
   /** Theme id; the canvas restyles itself when it changes. */
   theme: string;
+  indexOpen: boolean;
+  onToggleIndex: () => void;
 }
 
 interface Selection {
@@ -82,6 +84,8 @@ export function MarketChart({
   onSelectEvent,
   onSelectionActiveChange,
   theme,
+  indexOpen,
+  onToggleIndex,
 }: Props) {
   const tokRef = useRef(tok);
   const elRef = useRef<HTMLDivElement>(null);
@@ -938,6 +942,20 @@ export function MarketChart({
       <div className="tools">
         <button
           type="button"
+          className={"aside-toggle" + (indexOpen ? " on" : "")}
+          aria-pressed={indexOpen}
+          aria-label={indexOpen ? "Hide the series index" : "Show the series index"}
+          title={indexOpen ? "Hide the series index" : "Show the series index"}
+          onClick={onToggleIndex}
+        >
+          <svg viewBox="0 0 18 14" width="18" height="14" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.2">
+            <rect x="0.6" y="0.6" width="16.8" height="12.8" />
+            <path d="M6.5 0.6 V13.4" />
+            {indexOpen && <rect x="0.6" y="0.6" width="5.9" height="12.8" fill="currentColor" stroke="none" />}
+          </svg>
+        </button>
+        <button
+          type="button"
           className={"tg" + (annotationsOn ? " active" : "")}
           aria-pressed={annotationsOn}
           onClick={onToggleAnnotations}
@@ -1022,6 +1040,7 @@ export function MarketChart({
             </span>
           )}
         </span>
+
       </div>
 
       <div className="plot">

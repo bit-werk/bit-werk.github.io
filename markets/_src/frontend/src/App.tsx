@@ -113,6 +113,22 @@ export function App() {
     }
   };
   const [sourcesOpen, setSourcesOpen] = useState(false);
+  const [indexOpen, setIndexOpen] = useState(() => {
+    try {
+      return localStorage.getItem("mc-index") !== "0";
+    } catch {
+      return true;
+    }
+  });
+  const toggleIndex = () =>
+    setIndexOpen((v) => {
+      try {
+        localStorage.setItem("mc-index", v ? "0" : "1");
+      } catch {
+        /* ignore */
+      }
+      return !v;
+    });
 
   // Switching to manual: seed the range from the visible price-axis series so
   // the user has a sensible starting point to edit.
@@ -208,7 +224,7 @@ export function App() {
 
   return (
     <div className="page">
-      <div className="sheet" data-tab={tab} data-lower={lowerTab}>
+      <div className="sheet" data-tab={tab} data-lower={lowerTab} data-index={indexOpen ? "open" : "closed"}>
         <div className="workspace">
         <header className="mast">
           <h1>Market Cycles</h1>
@@ -258,6 +274,8 @@ export function App() {
               onSelectEvent={selectEvent}
               onSelectionActiveChange={setSelectionActive}
               theme={theme}
+              indexOpen={indexOpen}
+              onToggleIndex={toggleIndex}
             />
             </>
           )}
