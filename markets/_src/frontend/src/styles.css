@@ -170,11 +170,9 @@ body { overflow: hidden; }
 /* glossary terms inside the course text */
 .term { position: relative; border-bottom: 1px dotted var(--gold); cursor: help; outline: none; }
 .term-pop {
-  display: none; position: absolute; top: 100%; left: 0; margin-top: 6px; z-index: 60; width: max-content; max-width: 300px;
+  position: fixed; top: 0; left: 0; z-index: 2100; width: max-content; max-width: min(300px, calc(100vw - 16px)); overflow-y: auto;
   background: var(--pop-bg); border: 1px solid var(--rule-gold); padding: 10px 12px; font-size: 0.86rem; font-weight: 300; line-height: 1.5; cursor: auto; white-space: normal; color: var(--ink);
 }
-.term-pop::before { content: ""; position: absolute; top: -8px; left: 0; right: 0; height: 8px; }
-.term:hover .term-pop, .term:focus .term-pop, .term:focus-within .term-pop { display: block; }
 .term-pop-title { display: block; font-weight: 500; margin-bottom: 3px; color: var(--gold); }
 .term-pop-def { display: block; color: var(--dim); margin-bottom: 7px; }
 .term-pop a { text-decoration: underline; text-underline-offset: 3px; }
